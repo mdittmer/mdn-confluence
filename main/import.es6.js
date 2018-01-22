@@ -27,11 +27,10 @@ const logger = foam.log.ConsoleLogger.create();
 
 const USAGE = `USAGE:
 
-    node /path/to/import.es6.js BaseConfluenceDataURL
+    node /path/to/import.es6.js ConfluenceDataURL
 
-        BaseConfluenceDataURL = absolute https: or file: URL to directory
-                                where Confluence data are stored with NO
-                                trailing slash.`;
+        ConfluenceDataURL = absolute https: or file: URL to JSON for Confluence
+                            GridRows.`;
 if (process.argv.length !== 3) {
   console.error(USAGE);
   process.exit(1);
@@ -39,24 +38,13 @@ if (process.argv.length !== 3) {
 
 const dataUrl = url.parse(process.argv[2]);
 if (dataUrl.protocol !== 'file:' && dataUrl.protocol !== 'https:') {
-  console.error('BaseConfluenceDataURL parameter must be file: or https: URL');
+  console.error('ConfluenceDataURL parameter must be file: or https: URL');
 }
 
-let container = chr.JsonDAOContainer.create({
-  mode: dataUrl.protocol === 'file:' ? chr.JsonDAOContainerMode.LOCAL :
-      chr.JsonDAOContainerMode.HTTP,
-  basename: dataUrl.protocol === 'file:' ? dataUrl.pathname : url.format(dataUrl),
-}, logger);
+let inputDAO = dataUrl.protocol === 'file:' ?
+    chr.SerializableLocalJsonDAO.create({of: mdn.GridRow, path: dataUrl.pathname}) :
+    chr.SerializableHttpJsonDAO.create({of: mdn.GridRow, url: url.format(dataUrl)});
 
-const E = foam.mlang.ExpressionsSingleton.create();
-
-Promise.all([
-  container.releaseDAO.select(E.COUNT())
-      .then(countSink => console.log(countSink.value, 'releases')),
-  container.webInterfaceDAO.select(E.COUNT())
-      .then(countSink => console.log(countSink.value, 'APIs')),
-  container.releaseWebInterfaceJunctionDAO.select(E.COUNT())
-      .then(countSink => console.log(countSink.value, 'release <--> APIs')),
-]).then(function() {
-  console.log('DONE');
+inputDAO.select().then(arraySink => {
+  logger.info(`${arraySink.array.length} API rows from Confluence`);
 });
