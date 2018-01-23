@@ -3,11 +3,10 @@
 // found in the LICENSE file.
 'use strict';
 
+const fs = require('fs');
 const path = require('path');
 const process = require('process');
 const url = require('url');
-
-const compat = require('mdn-browser-compat-data');
 
 require('foam2');
 
@@ -20,7 +19,10 @@ require('../node_modules/web-api-confluence-dashboard/lib/web_apis/release.es6.j
 require('../node_modules/web-api-confluence-dashboard/lib/web_apis/release_interface_relationship.es6.js');
 require('../node_modules/web-api-confluence-dashboard/lib/web_apis/web_interface.es6.js');
 
-require('../lib/org/mozilla/mdn/GridRow.es6.js');
+require('../lib/org/mozilla/mdn/GridProperty.es6.js');
+require('../lib/org/mozilla/mdn/BrowserInfo.es6.js');
+require('../lib/org/mozilla/mdn/CompatRow.es6.js');
+require('../lib/org/mozilla/mdn/ConfluenceClassGenerator.es6.js');
 
 const chr = org.chromium.apis.web;
 const mdn = org.mozilla.mdn;
@@ -53,61 +55,115 @@ const releaseDAO = releaseUrl.protocol === 'file:' ?
       chr.SerializableLocalJsonDAO.create({of: chr.Release, path: releaseUrl.pathname}) :
       chr.SerializableHttpJsonDAO.create({of: chr.Release, url: url.format(releaseUrl)});
 
+
+const outputter = foam.json.Outputter.create({
+  pretty: false,
+  formatDatesAsNumbers: true,
+  outputDefaultValues: false,
+  useShortNames: false,
+  strict: true,
+});
+const foamStore = (dataDir, src, opt_name) => {
+  let cls = src.cls_;
+  if (foam.dao.ArraySink.isInstance(src)) {
+    cls = src.of || src.array[0] ? src.array[0].cls_ :
+        foam.core.FObject;
+    src = src.array;
+  }
+  foam.assert(cls || opt_name, 'foamStore: Must specify class or name');
+  logger.info(`Storing ${opt_name ? opt_name : cls.id}`);
+  return new Promise((resolve, reject) => {
+    fs.writeFile(
+        `${__dirname}/../data/${dataDir}/${opt_name || cls.id}.json`,
+        outputter.stringify(src, cls),
+        error => {
+          if (error) {
+            logger.error(`Error storing ${opt_name ? opt_name : cls.id}`,
+                         error);
+            reject(error);
+          } else {
+            logger.info(`Stored ${opt_name ? opt_name : cls.id}`);
+            resolve();
+          }
+        });
+  });
+};
+
+let confluenceDAO;
+let mdnDAO;
+let issueDAO;
 (async function() {
   const releaseSink = await releaseDAO.select();
   const releases = releaseSink.array;
-
 
   let browserNameMap = {};
   for (const release of releases) {
     browserNameMap[release.browserName.toLowerCase()] = release.browserName;
   }
 
-  const gridDAO = chr.GridDAO.create({
-    cols: releases,
-    of: mdn.GridRow,
-    delegate: dataUrl.protocol === 'file:' ?
-        chr.SerializableLocalJsonDAO.create({of: mdn.GridRow, path: dataUrl.pathname}) :
-        chr.SerializableHttpJsonDAO.create({of: mdn.GridRow, url: url.format(dataUrl)}),
-  });
-  const ctx = foam.createSubContext({gridDAO});
+  const confluenceClassGenerator =
+        mdn.ConfluenceClassGenerator.create();
+  const confluenceRowSpec = confluenceClassGenerator
+        .generateSpec('org.mozilla.mdn.generated', 'ConfluenceRow', releases);
+  const ConfluenceRow = confluenceClassGenerator.
+        generateClass(confluenceRowSpec);
 
-  const rowSink = await gridDAO.select();
-  const confluenceApis = rowSink.array;
-  logger.info(`${confluenceApis.length} API rows from Confluence`);
+  return Promise.all([
+    (async function() {
+      confluenceDAO = foam.dao.MDAO.create({of: ConfluenceRow});
 
-  let confluenceApiMap = {};
-  for (const api of confluenceApis) {
-    confluenceApiMap[api.id] = api;
-  }
-  for (const iface of Object.keys(compat.api)) {
-    if (iface.indexOf('__') !== -1) continue;
-    for (const api of Object.keys(compat.api[iface])) {
-      if (api.indexOf('__') !== -1) continue;
-      const id = `${iface}#${api}`;
-      let row = confluenceApiMap[id] ?
-          confluenceApiMap[id].clone(ctx) :
-          mdn.GridRow.create({id}, ctx);
-      const compatMap = compat.api[iface][api].__compat.support;
-      const compatKeys = Object.keys(compatMap)
-          .filter(key => !!browserNameMap[key]);
-      let versionInfos = [];
-      for (const key of compatKeys) {
-        if (!compatMap[key].version_added && !compatMap[key].version_removed) {
-          logger.warn(`No version info for ${key}`);
-          continue;
-        }
+      const gridDAO = chr.GridDAO.create({
+        cols: releases,
+        of: chr.GridRow,
+        delegate: dataUrl.protocol === 'file:' ?
+            chr.SerializableLocalJsonDAO.create({of: chr.GridRow, path: dataUrl.pathname}) :
+        chr.SerializableHttpJsonDAO.create({of: chr.GridRow, url: url.format(dataUrl)}),
+      });
+      const ctx = foam.createSubContext({gridDAO});
 
-        const versionInfo = mdn.VersionInfo.create({
-          browserName: browserNameMap[key],
-          versionAdded: compatMap[key].version_added || '',
-          versionRemoved: compatMap[key].version_removed || '',
-        }, ctx);
-        versionInfo.getConfluenceAnomalies(row);
-        versionInfos.push(versionInfo);
+      const rowSink = await gridDAO.select();
+      const confluenceApis = rowSink.array;
+      logger.info(`${confluenceApis.length} API rows from Confluence`);
+
+      for (const api of confluenceApis) {
+        confluenceDAO.put(ConfluenceRow.create(null, ctx).fromGridRow(api));
       }
-      row.compatVersionInfo = versionInfos;
-      gridDAO.put(row);
-    }
-  }
-})();
+
+      const confluenceRows = await confluenceDAO.select(
+          foam.dao.ArraySink.create({of: ConfluenceRow}));
+      return Promise.all([
+        foamStore('confluence', confluenceRowSpec, `class:${ConfluenceRow.id}`),
+        foamStore('confluence', confluenceRows),
+      ]);
+    })(),
+    (async function() {
+      const mdnData = require('mdn-browser-compat-data');
+      mdnDAO = foam.dao.MDAO.create({of: mdn.CompatRow});
+      for (const iface of Object.keys(mdnData.api)) {
+        if (iface.indexOf('__') !== -1) continue;
+        for (const api of Object.keys(mdnData.api[iface])) {
+          if (api.indexOf('__') !== -1) continue;
+          mdnDAO.put(mdn.CompatRow.create({
+            id: `${iface}#${api}`,
+          }).fromMdnData(mdnData.api[iface][api], browserNameMap));
+        }
+      }
+      const mdnRows = await mdnDAO.select(
+          foam.dao.ArraySink.create({of: mdn.CompatRow}));
+      return foamStore('mdn', mdnRows);
+    })(),
+  ]);
+})().then(async function() {
+  require('../lib/org/mozilla/mdn/IssueType.es6.js');
+  require('../lib/org/mozilla/mdn/IssueStatus.es6.js');
+  require('../lib/org/mozilla/mdn/Issue.es6.js');
+  require('../lib/org/mozilla/mdn/VersionIssueGenerator.es6.js');
+
+  issueDAO = await mdn.VersionIssueGenerator.create()
+      .generateIssues(confluenceDAO, mdnDAO, foam.dao.MDAO.create({
+        of: mdn.Issue,
+      }));
+  const issueRows = await issueDAO.select(
+      foam.dao.ArraySink.create({of: mdn.Issue}));
+  return foamStore('issues', issueRows);
+}).then(() => logger.info('DONE'));

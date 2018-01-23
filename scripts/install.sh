@@ -24,3 +24,7 @@ rm -rf foam2
 ln -s "${FD}" foam2
 rm -rf web-api-confluence-dashboard
 ln -s "${CD}" web-api-confluence-dashboard
+
+mkdir -p "${WD}/../data/confluence"
+mkdir -p "${WD}/../data/mdn"
+mkdir -p "${WD}/../data/issues"
