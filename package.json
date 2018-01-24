@@ -5,6 +5,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "scripts": {
+    "debug": "node --inspect-brk main/import.es6.js https://storage.googleapis.com/web-api-confluence-data-cache/archive/2018-01-22/00/json/org.chromium.apis.web.Release.json https://storage.googleapis.com/web-api-confluence-data-cache/archive/2018-01-22/00/json/org.chromium.apis.web.GridRow.json"
+  },
   "author": "Mark Dittmer",
   "dependencies": {
     "foam2": "git://github.com/foam-framework/foam2.git#confluence",
