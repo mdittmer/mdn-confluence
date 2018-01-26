@@ -57,13 +57,13 @@ const releaseDAO = releaseUrl.protocol === 'file:' ?
 
 
 const outputter = foam.json.Outputter.create({
-  pretty: false,
+  pretty: true,
   formatDatesAsNumbers: true,
   outputDefaultValues: false,
   useShortNames: false,
   strict: true,
 });
-const foamStore = (dataDir, src, opt_name) => {
+const foamStore = (dataDir, src, opt_name, opt_outputter) => {
   let cls = src.cls_;
   if (foam.dao.ArraySink.isInstance(src)) {
     cls = src.of || src.array[0] ? src.array[0].cls_ :
@@ -75,7 +75,7 @@ const foamStore = (dataDir, src, opt_name) => {
   return new Promise((resolve, reject) => {
     fs.writeFile(
         `${__dirname}/../data/${dataDir}/${opt_name || cls.id}.json`,
-        outputter.stringify(src, cls),
+        (opt_outputter || outputter).stringify(src, cls),
         error => {
           if (error) {
             logger.error(`Error storing ${opt_name ? opt_name : cls.id}`,
@@ -132,7 +132,15 @@ let issueDAO;
       const confluenceRows = await confluenceDAO.select(
           foam.dao.ArraySink.create({of: ConfluenceRow}));
       return Promise.all([
-        foamStore('confluence', confluenceRowSpec, `class:${ConfluenceRow.id}`),
+
+        foamStore('confluence', confluenceRowSpec, `class:${ConfluenceRow.id}`,
+                  foam.json.Outputter.create({
+                    pretty: true,
+                    formatDatesAsNumbers: true,
+                    outputDefaultValues: false,
+                    useShortNames: false,
+                    strict: false,
+                  })),
         foamStore('confluence', confluenceRows),
       ]);
     })(),
@@ -166,4 +174,32 @@ let issueDAO;
   const issueRows = await issueDAO.select(
       foam.dao.ArraySink.create({of: mdn.Issue}));
   return foamStore('issues', issueRows);
-}).then(() => logger.info('DONE'));
+}).then((async function() {
+  // DAO is an async interface to an abstract collection. It SELECT()s into
+  // a Sink interface. The default Sink is an ArraySink, with a .array property
+  // containing an array of results.
+  //
+  // See https://github.com/foam-framework/foam2/blob/master/doc/guides/Dao.md.
+  var sink = await confluenceDAO.select();
+  var array = sink.array;
+  console.log('Confluence data', array);
+  var item = array[0];
+  // Look up bool for Firefox 45, OSX 10.11.
+  console.log('First item random compat bool', item.firefox45_0oSX10_11);
+  // Look up metadata:
+  // (1) FIREFOX45_0O_SX10_11 is the property object for this bool (not the bool
+  //     value itself).
+  // (2) It's a GridProperty, which has a "release" property containing the
+  //     associated Release object.
+  // (3) Ask the release object for it's "id" property value.
+  console.log('Which release is this bool for?',
+              array[0].FIREFOX45_0O_SX10_11.release.id);
+  // For any of these objects, we can ask for a properties summary with
+  // the .describe() method:
+  console.log('The item\'s description is:');
+  item.describe();
+
+  debugger;
+
+  logger.info('DONE');
+}));
