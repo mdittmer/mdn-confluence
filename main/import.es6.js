@@ -57,13 +57,13 @@ const releaseDAO = releaseUrl.protocol === 'file:' ?
 
 
 const outputter = foam.json.Outputter.create({
-  pretty: false,
+  pretty: true,
   formatDatesAsNumbers: true,
   outputDefaultValues: false,
   useShortNames: false,
   strict: true,
 });
-const foamStore = (dataDir, src, opt_name) => {
+const foamStore = (dataDir, src, opt_name, opt_outputter) => {
   let cls = src.cls_;
   if (foam.dao.ArraySink.isInstance(src)) {
     cls = src.of || src.array[0] ? src.array[0].cls_ :
@@ -75,7 +75,7 @@ const foamStore = (dataDir, src, opt_name) => {
   return new Promise((resolve, reject) => {
     fs.writeFile(
         `${__dirname}/../data/${dataDir}/${opt_name || cls.id}.json`,
-        outputter.stringify(src, cls),
+        (opt_outputter || outputter).stringify(src, cls),
         error => {
           if (error) {
             logger.error(`Error storing ${opt_name ? opt_name : cls.id}`,
@@ -132,7 +132,15 @@ let issueDAO;
       const confluenceRows = await confluenceDAO.select(
           foam.dao.ArraySink.create({of: ConfluenceRow}));
       return Promise.all([
-        foamStore('confluence', confluenceRowSpec, `class:${ConfluenceRow.id}`),
+
+        foamStore('confluence', confluenceRowSpec, `class:${ConfluenceRow.id}`,
+                  foam.json.Outputter.create({
+                    pretty: true,
+                    formatDatesAsNumbers: true,
+                    outputDefaultValues: false,
+                    useShortNames: false,
+                    strict: false,
+                  })),
         foamStore('confluence', confluenceRows),
       ]);
     })(),
