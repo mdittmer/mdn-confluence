@@ -14,8 +14,9 @@
     <script src="lib/org/mozilla/mdn/IssueType.es6.js"></script>
     <script src="lib/org/mozilla/mdn/Issue.es6.js"></script>
     <script src="lib/org/mozilla/mdn/VersionIssueGenerator.es6.js"></script>
-    <script src="lib/org/mozilla/mdn/ScrollDAOView.es6.js"></script>
     <script src="lib/org/mozilla/mdn/ScrollDAOTable.es6.js"></script>
+    <script src="lib/org/mozilla/mdn/DAOController.es6.js"></script>
+    <script src="lib/org/mozilla/mdn/DAOControllerView.es6.js"></script>
     <style>
       body { margin: 0; padding: 0; }
     </style>
@@ -62,30 +63,47 @@
           ],
         });
 
+
         /* foam.u2.view.TableView.create({
          *   of: ConfluenceRow,
          *   data: confluenceDAO,
          * }).write(document);*/
+
 
         /* mdn.ScrollDAOView.create({
          *   data: confluenceDAO,
          *   rowFormatter: mdn.ConfluenceRowFormatter.create(),
          * }).write(document);*/
 
+
         // TODO(markdittmer): Shouldn't these already be in release date order?
-        const cols = [ConfluenceRow.ID].concat(
+        const columns = [ConfluenceRow.ID].concat(
           ConfluenceRow.getAxiomsByClass(mdn.GridProperty)
                        .filter(prop => !prop.release.isMobile)
                        .sort((prop1, prop2) => prop1.release.releaseDate > prop2.release.releaseDate)
                        .slice(-4));
-
-        mdn.ScrollDAOTable.create({
-          of: ConfluenceRow,
+        const ctx = foam.createSubContext({columns});
+        const ctlr = mdn.DAOController.create({
           data: confluenceDAO,
-          columns_: cols,
-          /* data: confluenceDAO,*/
-          /* rowFormatter: mdn.ConfluenceRowFormatter.create(),*/
-        }).write(document);
+        }, ctx);
+        mdn.DAOControllerView.create({
+          data: ctlr,
+        }, ctx).write(document);
+
+
+        // TODO(markdittmer): Shouldn't these already be in release date order?
+        /* const columns = [ConfluenceRow.ID].concat(
+         *   ConfluenceRow.getAxiomsByClass(mdn.GridProperty)
+         *                .filter(prop => !prop.release.isMobile)
+         *                .sort((prop1, prop2) => prop1.release.releaseDate > prop2.release.releaseDate)
+         *                .slice(-4));
+         * mdn.ScrollDAOTable.create({
+         *   of: ConfluenceRow,
+         *   data: confluenceDAO,
+         *   columns_: cols,
+         *   // data: confluenceDAO,
+         *   // rowFormatter: mdn.ConfluenceRowFormatter.create(),
+         * }).write(document);*/
       })();
       /* var gridDAO = org.chromium.apis.web.GridDAO.create();
        * var dao = foam.dao.PromisedDAO.create({
