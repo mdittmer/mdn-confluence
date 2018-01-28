@@ -17,6 +17,8 @@
     <script src="lib/org/mozilla/mdn/ScrollDAOTable.es6.js"></script>
     <script src="lib/org/mozilla/mdn/DAOController.es6.js"></script>
     <script src="lib/org/mozilla/mdn/DAOControllerView.es6.js"></script>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
       body { margin: 0; padding: 0; }
     </style>
@@ -77,12 +79,16 @@
 
 
         // TODO(markdittmer): Shouldn't these already be in release date order?
-        const columns = [ConfluenceRow.ID].concat(
+        const sortedColumns = [ConfluenceRow.ID].concat(
           ConfluenceRow.getAxiomsByClass(mdn.GridProperty)
                        .filter(prop => !prop.release.isMobile)
-                       .sort((prop1, prop2) => prop1.release.releaseDate > prop2.release.releaseDate)
-                       .slice(-4));
-        const ctx = foam.createSubContext({columns});
+                       .sort((prop1, prop2) => prop1.release.releaseDate > prop2.release.releaseDate));
+        const columns = sortedColumns.map(col => col.name);
+        const columns_ = [sortedColumns[0]].concat(sortedColumns.slice(-4));
+        const ctx = foam.createSubContext({
+          columns,
+          columns_,
+        });
         const ctlr = mdn.DAOController.create({
           data: confluenceDAO,
         }, ctx);
