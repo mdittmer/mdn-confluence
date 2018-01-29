@@ -93,7 +93,7 @@ let confluenceDAO;
 let mdnDAO;
 let issueDAO;
 (async function() {
-  const releaseSink = await releaseDAO.select();
+  const releaseSink = await releaseDAO.orderBy(chr.Release.RELEASE_DATE).select();
   const releases = releaseSink.array;
 
   let browserNameMap = {};
