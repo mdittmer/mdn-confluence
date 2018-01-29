@@ -14,6 +14,7 @@
     <script src="lib/org/mozilla/mdn/IssueType.es6.js"></script>
     <script src="lib/org/mozilla/mdn/Issue.es6.js"></script>
     <script src="lib/org/mozilla/mdn/VersionIssueGenerator.es6.js"></script>
+    <script src="lib/org/mozilla/mdn/EditColumnsView.es6.js"></script>
     <script src="lib/org/mozilla/mdn/ScrollDAOTable.es6.js"></script>
     <script src="lib/org/mozilla/mdn/DAOController.es6.js"></script>
     <script src="lib/org/mozilla/mdn/DAOControllerView.es6.js"></script>
@@ -83,18 +84,16 @@
           ConfluenceRow.getAxiomsByClass(mdn.GridProperty)
                        .filter(prop => !prop.release.isMobile)
                        .sort((prop1, prop2) => prop1.release.releaseDate > prop2.release.releaseDate));
-        const columns = sortedColumns.map(col => col.name);
-        const columns_ = [sortedColumns[0]].concat(sortedColumns.slice(-4));
-        const ctx = foam.createSubContext({
-          columns,
-          columns_,
-        });
+        const selectableColumns = Array.from(sortedColumns);
+        const selectedColumns = [sortedColumns[0]].concat(sortedColumns.slice(-4));
         const ctlr = mdn.DAOController.create({
           data: confluenceDAO,
-        }, ctx);
+        });
         mdn.DAOControllerView.create({
           data: ctlr,
-        }, ctx).write(document);
+	  selectableColumns,
+	  selectedColumns,
+        }).write(document);
 
 
         // TODO(markdittmer): Shouldn't these already be in release date order?
