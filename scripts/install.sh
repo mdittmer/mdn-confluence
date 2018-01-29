@@ -1,5 +1,15 @@
 #!/bin/bash
 
+function absdir() {
+  pushd "${1}" > /dev/null
+  if [ "${?}" != "0" ]; then
+    echo "${1}"
+    return 1
+  fi
+  pwd
+  popd > /dev/null
+}
+
 set -e
 
 # TODO(markdittmer): This is pretty silly, but confluence require()s include
@@ -13,9 +23,9 @@ if [ ! -d "${2}" ]; then
   exit 1
 fi
 
-WD=$(readlink -f $(dirname "$BASH_SOURCE"))
-FD=$(readlink -f "${1}")
-CD=$(readlink -f "${2}")
+WD=$(absdir $(dirname "$BASH_SOURCE"))
+FD=$(absdir "${1}")
+CD=$(absdir "${2}")
 
 cd "${WD}/.."
 npm install
