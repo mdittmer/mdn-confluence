@@ -21,7 +21,8 @@ require('../node_modules/web-api-confluence-dashboard/lib/web_apis/web_interface
 
 require('../lib/org/mozilla/mdn/GridProperty.es6.js');
 require('../lib/org/mozilla/mdn/BrowserInfo.es6.js');
-require('../lib/org/mozilla/mdn/CompatRow.es6.js');
+require('../lib/org/mozilla/mdn/BrowserInfoProperty.es6.js');
+require('../lib/org/mozilla/mdn/CompatClassGenerator.es6.js');
 require('../lib/org/mozilla/mdn/ConfluenceClassGenerator.es6.js');
 
 const chr = org.chromium.apis.web;
@@ -132,7 +133,6 @@ let issueDAO;
       const confluenceRows = await confluenceDAO.select(
           foam.dao.ArraySink.create({of: ConfluenceRow}));
       return Promise.all([
-
         foamStore('confluence', confluenceRowSpec, `class:${ConfluenceRow.id}`,
                   foam.json.Outputter.create({
                     pretty: true,
@@ -146,19 +146,63 @@ let issueDAO;
     })(),
     (async function() {
       const mdnData = require('mdn-browser-compat-data');
-      mdnDAO = foam.dao.MDAO.create({of: mdn.CompatRow});
+
+      const getBrowserName = mdn.CompatClassGenerator
+            .getAxiomByName('browserNameFromMdnKey').code;
+      const getPropName = mdn.CompatClassGenerator
+            .getAxiomByName('propNameFromMdnKey').code;
+      let browserInfoPropMap = {};
       for (const iface of Object.keys(mdnData.api)) {
         if (iface.indexOf('__') !== -1) continue;
         for (const api of Object.keys(mdnData.api[iface])) {
           if (api.indexOf('__') !== -1) continue;
-          mdnDAO.put(mdn.CompatRow.create({
+          const keys = Object.keys(mdnData.api[iface][api].__compat.support);
+          for (const key of keys) {
+            if (browserInfoPropMap[key]) continue;
+            const browserName = getBrowserName(key);
+            browserInfoPropMap[key] = {
+              class: 'org.mozilla.mdn.BrowserInfoProperty',
+              name: getPropName(key),
+              label: browserName,
+              browserName: browserName,
+            };
+          }
+        }
+      }
+      let browserInfoProps = [];
+      for (const key of Object.keys(browserInfoPropMap)) {
+        browserInfoProps.push(browserInfoPropMap[key]);
+      }
+      const compatClassGenerator =
+            mdn.CompatClassGenerator.create();
+      const compatRowSpec = compatClassGenerator
+            .generateSpec('org.mozilla.mdn.generated', 'CompatRow', browserInfoProps);
+      const CompatRow = compatClassGenerator.
+            generateClass(compatRowSpec);
+
+      mdnDAO = foam.dao.MDAO.create({of: CompatRow});
+      for (const iface of Object.keys(mdnData.api)) {
+        if (iface.indexOf('__') !== -1) continue;
+        for (const api of Object.keys(mdnData.api[iface])) {
+          if (api.indexOf('__') !== -1) continue;
+          mdnDAO.put(CompatRow.create({
             id: `${iface}#${api}`,
           }).fromMdnData(mdnData.api[iface][api], browserNameMap));
         }
       }
       const mdnRows = await mdnDAO.select(
-          foam.dao.ArraySink.create({of: mdn.CompatRow}));
-      return foamStore('mdn', mdnRows);
+          foam.dao.ArraySink.create({of: CompatRow}));
+      return Promise.all([
+        foamStore('mdn', compatRowSpec, `class:${CompatRow.id}`,
+                  foam.json.Outputter.create({
+                    pretty: true,
+                    formatDatesAsNumbers: true,
+                    outputDefaultValues: false,
+                    useShortNames: false,
+                    strict: false,
+                  })),
+        foamStore('mdn', mdnRows),
+      ]);
     })(),
   ]);
 })().then(async function() {
