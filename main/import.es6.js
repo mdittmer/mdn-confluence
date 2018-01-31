@@ -151,12 +151,20 @@ let issueDAO;
             .getAxiomByName('browserNameFromMdnKey').code;
       const getPropName = mdn.CompatClassGenerator
             .getAxiomByName('propNameFromMdnKey').code;
+
+      const mdnApis = Object.assign(
+          {}, mdnData.api, mdnData.javascript.builtins);
+
       let browserInfoPropMap = {};
-      for (const iface of Object.keys(mdnData.api)) {
+      for (const iface of Object.keys(mdnApis)) {
         if (iface.indexOf('__') !== -1) continue;
-        for (const api of Object.keys(mdnData.api[iface])) {
-          if (api.indexOf('__') !== -1) continue;
-          const keys = Object.keys(mdnData.api[iface][api].__compat.support);
+        for (const api of Object.keys(mdnApis[iface])) {
+          if (/[^a-z]/i.test(api) ||
+              !(mdnApis[iface][api].__compat &&
+                mdnApis[iface][api].__compat.support)) {
+            continue;
+          }
+          const keys = Object.keys(mdnApis[iface][api].__compat.support);
           for (const key of keys) {
             if (browserInfoPropMap[key]) continue;
             const browserName = getBrowserName(key);
@@ -181,13 +189,17 @@ let issueDAO;
             generateClass(compatRowSpec);
 
       mdnDAO = foam.dao.MDAO.create({of: CompatRow});
-      for (const iface of Object.keys(mdnData.api)) {
+      for (const iface of Object.keys(mdnApis)) {
         if (iface.indexOf('__') !== -1) continue;
-        for (const api of Object.keys(mdnData.api[iface])) {
-          if (api.indexOf('__') !== -1) continue;
+        for (const api of Object.keys(mdnApis[iface])) {
+          if (/[^a-z]/i.test(api) ||
+              !(mdnApis[iface][api].__compat &&
+                mdnApis[iface][api].__compat.support)) {
+            continue;
+          }
           mdnDAO.put(CompatRow.create({
             id: `${iface}#${api}`,
-          }).fromMdnData(mdnData.api[iface][api], browserNameMap));
+          }).fromMdnData(mdnApis[iface][api], browserNameMap));
         }
       }
       const mdnRows = await mdnDAO.select(

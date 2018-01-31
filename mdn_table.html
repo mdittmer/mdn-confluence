@@ -11,7 +11,10 @@
     <script src="lib/org/mozilla/mdn/BrowserInfoProperty.es6.js"></script>
     <script src="lib/org/mozilla/mdn/mlang/Seq.es6.js"></script>
     <script src="lib/org/mozilla/mdn/mlang/Expressions.es6.js"></script>
-    <script src="lib/org/mozilla/mdn/parse/NullQueryParser.es6.js"></script>
+    <script src="lib/org/mozilla/mdn/parse/CompatQueryInterpreter.es6.js"></script>
+    <script src="lib/org/mozilla/mdn/parse/DefaultCompatQueryInterpreter.es6.js"></script>
+    <script src="lib/org/mozilla/mdn/parse/BrowserInfoCompatQueryInterpreter.es6.js"></script>
+    <script src="lib/org/mozilla/mdn/parse/CompatQueryParser.es6.js"></script>
     <script src="lib/org/mozilla/mdn/SearchView.es6.js"></script>
     <script src="lib/org/mozilla/mdn/EditColumnsView.es6.js"></script>
     <script src="lib/org/mozilla/mdn/ScrollDAOTable.es6.js"></script>
@@ -25,6 +28,7 @@
   </head>
   <body style="font-family: roboto; color: rgba(0, 0, 0, 0.8); width: 100vw; height: 100vh; display: grid">
     <script>
+      var mdnDAO;
       (async function() {
         const chr = org.chromium.apis.web;
         const mdn = org.mozilla.mdn;
@@ -39,7 +43,7 @@
         foam.package.registerClass(compatRowCls);
 
         const CompatRow = compatRowCls;
-        let mdnDAO = foam.dao.PromisedDAO.create({
+        mdnDAO = foam.dao.PromisedDAO.create({
           of: CompatRow,
           promise: fetch('data/mdn/org.mozilla.mdn.generated.CompatRow.json').then(response => response.json())
             .then(json => foam.json.parse(json, CompatRow))
@@ -60,7 +64,11 @@
                    }));
 
         const ctx = foam.createSubContext({
-          queryParserFactory: x => mdn.parse.NullQueryParser.create(null, x),
+          queryParserFactory: x => mdn.parse.CompatQueryParser.create({
+	    of: CompatRow,
+	    interpreter: mdn.parse.BrowserInfoCompatQueryInterpreter
+			    .create(null, x),
+	  }, x),
         });
         mdn.DAOControllerView.create({
           selectedColumns,
