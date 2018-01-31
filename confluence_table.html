@@ -32,7 +32,7 @@
       body { margin: 0; padding: 0; }
     </style>
   </head>
-  <body style="width: 100vw; height: 100vh; display: grid">
+  <body style="font-family: roboto; color: rgba(0, 0, 0, 0.8); width: 100vw; height: 100vh; display: grid">
     <script>
       (async function() {
         const chr = org.chromium.apis.web;
@@ -93,7 +93,18 @@
                        .filter(prop => !prop.release.isMobile)
                        .sort((prop1, prop2) => prop1.release.releaseDate > prop2.release.releaseDate));
         const selectableColumns = Array.from(sortedColumns);
-        const selectedColumns = [sortedColumns[0]].concat(sortedColumns.slice(-4));
+        const chromes = selectableColumns.filter(col => col.release && col.release.browserName === 'Chrome');
+        const edges = selectableColumns.filter(col => col.release && col.release.browserName === 'Edge');
+        const firefoxes = selectableColumns.filter(col => col.release && col.release.browserName === 'Firefox');
+        const safaris = selectableColumns.filter(col => col.release && col.release.browserName === 'Safari');
+        const selectedColumns = [
+          ConfluenceRow.ID,
+          chromes[chromes.length - 1],
+          edges[edges.length - 1],
+          firefoxes[firefoxes.length - 1],
+          safaris[safaris.length - 1],
+        ];
+        /* const selectedColumns = [sortedColumns[0]].concat(sortedColumns.slice(-4));*/
 	const ctx = foam.createSubContext({
 	  queryParserFactory: x => mdn.parse.ConfluenceQueryParser.create({
 	    of: ConfluenceRow,
