@@ -52,10 +52,19 @@
             }),
         });
 
-	const ctx = foam.createSubContext({
-	  queryParserFactory: x => mdn.parse.NullQueryParser.create(null, x),
-	});
-        mdn.DAOControllerView.create(null, mdn.DAOController.create({
+        const selectedColumns = [CompatRow.ID].concat(
+          CompatRow.getAxiomsByClass(mdn.BrowserInfoProperty)
+                   .filter(prop => {
+                     let pred = !/(mobile|android|ios)/i.test(prop.browserName);
+                     return pred;
+                   }));
+
+        const ctx = foam.createSubContext({
+          queryParserFactory: x => mdn.parse.NullQueryParser.create(null, x),
+        });
+        mdn.DAOControllerView.create({
+          selectedColumns,
+	}, mdn.DAOController.create({
           data: mdnDAO,
         }, ctx)).write(document);
       })();
