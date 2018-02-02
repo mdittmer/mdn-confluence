@@ -19,6 +19,7 @@ require('../node_modules/web-api-confluence-dashboard/lib/web_apis/release.es6.j
 require('../node_modules/web-api-confluence-dashboard/lib/web_apis/release_interface_relationship.es6.js');
 require('../node_modules/web-api-confluence-dashboard/lib/web_apis/web_interface.es6.js');
 
+require('../lib/org/mozilla/mdn/property.es6.js');
 require('../lib/org/mozilla/mdn/GridProperty.es6.js');
 require('../lib/org/mozilla/mdn/BrowserInfo.es6.js');
 require('../lib/org/mozilla/mdn/BrowserInfoProperty.es6.js');
