@@ -12,7 +12,10 @@
     <script src="lib/org/mozilla/mdn/Issue.es6.js"></script>
     <script src="lib/org/mozilla/mdn/mlang/Seq.es6.js"></script>
     <script src="lib/org/mozilla/mdn/mlang/Expressions.es6.js"></script>
-    <script src="lib/org/mozilla/mdn/parse/NullQueryParser.es6.js"></script>
+    <script src="lib/org/mozilla/mdn/parse/IssueQueryInterpreter.es6.js"></script>
+    <script src="lib/org/mozilla/mdn/parse/DefaultIssueQueryInterpreter.es6.js"></script>
+    <script src="lib/org/mozilla/mdn/parse/SimpleIssueQueryInterpreter.es6.js"></script>
+    <script src="lib/org/mozilla/mdn/parse/IssueQueryParser.es6.js"></script>
     <script src="lib/org/mozilla/mdn/SearchView.es6.js"></script>
     <script src="lib/org/mozilla/mdn/EditColumnsView.es6.js"></script>
     <script src="lib/org/mozilla/mdn/ScrollDAOTable.es6.js"></script>
@@ -46,7 +49,11 @@
         });
 
         const ctx = foam.createSubContext({
-          queryParserFactory: x => mdn.parse.NullQueryParser.create(null, x),
+          queryParserFactory: x => mdn.parse.IssueQueryParser.create({
+	    of: mdn.Issue,
+	    interpreter: mdn.parse.SimpleIssueQueryInterpreter
+			    .create(null, x),
+	  }, x),
         });
         mdn.DAOControllerView.create({
 	}, mdn.DAOController.create({
