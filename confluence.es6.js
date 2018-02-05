@@ -26,17 +26,17 @@
       }),
   });
 
-  foam.CLASS({
-    package: 'org.mozilla.mdn',
-    name: 'ConfluenceRowFormatter',
-    implements: ['foam.u2.RowFormatter'],
+  // foam.CLASS({
+  //   package: 'org.mozilla.mdn',
+  //   name: 'ConfluenceRowFormatter',
+  //   implements: ['foam.u2.RowFormatter'],
 
-    methods: [
-      function format(data) {
-        return `<span>${data ? data.id : ''}</span>`;
-      },
-    ],
-  });
+  //   methods: [
+  //     function format(data) {
+  //       return `<span>${data ? data.id : ''}</span>`;
+  //     },
+  //   ],
+  // });
 
 
   /* foam.u2.view.TableView.create({
