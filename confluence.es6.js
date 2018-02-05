@@ -56,19 +56,19 @@
     ConfluenceRow.getAxiomsByClass(mdn.GridProperty)
       .filter(prop => !prop.release.isMobile)
       .sort((prop1, prop2) => prop1.release.releaseDate > prop2.release.releaseDate));
-  const selectableColumns = Array.from(sortedColumns);
-  const chromes = selectableColumns.filter(col => col.release && col.release.browserName === 'Chrome');
-  const edges = selectableColumns.filter(col => col.release && col.release.browserName === 'Edge');
-  const firefoxes = selectableColumns.filter(col => col.release && col.release.browserName === 'Firefox');
-  const safaris = selectableColumns.filter(col => col.release && col.release.browserName === 'Safari');
-  const selectedColumns = [
+  const selectable = Array.from(sortedColumns);
+  const chromes = selectable.filter(col => col.release && col.release.browserName === 'Chrome');
+  const edges = selectable.filter(col => col.release && col.release.browserName === 'Edge');
+  const firefoxes = selectable.filter(col => col.release && col.release.browserName === 'Firefox');
+  const safaris = selectable.filter(col => col.release && col.release.browserName === 'Safari');
+  const selected = [
     ConfluenceRow.ID,
     chromes[chromes.length - 1],
     edges[edges.length - 1],
     firefoxes[firefoxes.length - 1],
     safaris[safaris.length - 1],
   ];
-  /* const selectedColumns = [sortedColumns[0]].concat(sortedColumns.slice(-4));*/
+  /* const selected = [sortedColumns[0]].concat(sortedColumns.slice(-4));*/
   const ctx = foam.createSubContext({
     queryParserFactory: x => mdn.parse.ConfluenceQueryParser.create({
       of: ConfluenceRow,
@@ -77,8 +77,8 @@
     }, x),
   });
   mdn.DAOControllerView.create({
-    selectableColumns,
-    selectedColumns,
+    selectable,
+    selected,
   }, mdn.DAOController.create({
     data: confluenceDAO,
   }, ctx)).write(document);

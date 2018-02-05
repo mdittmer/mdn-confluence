@@ -26,7 +26,7 @@ var mdnDAO;
       }),
   });
 
-  const selectedColumns = [CompatRow.ID].concat(
+  const selected = [CompatRow.ID].concat(
     CompatRow.getAxiomsByClass(mdn.BrowserInfoProperty)
       .filter(prop => {
         let pred = !/(mobile|android|ios)/i.test(prop.browserName);
@@ -41,7 +41,7 @@ var mdnDAO;
     }, x),
   });
   mdn.DAOControllerView.create({
-    selectedColumns,
+    selected,
   }, mdn.DAOController.create({
     data: mdnDAO,
   }, ctx)).write(document);
