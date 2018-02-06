@@ -157,6 +157,10 @@
       foreignPredicateProviders: [
         mdn.ConfluenceCompatPredicateProvider.create(),
         mdn.CompatConfluencePredicateProvider.create(),
+        mdn.ConfluenceIssuePredicateProvider.create(),
+        mdn.IssueConfluencePredicateProvider.create(),
+        mdn.CompatIssuePredicateProvider.create(),
+        mdn.IssueCompatPredicateProvider.create(),
       ],
     }),
   });
