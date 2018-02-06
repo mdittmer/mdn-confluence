@@ -138,21 +138,26 @@
   // Render
   //
 
-  mdn.MultiDAOControllerView.create({
-  }, mdn.MultiDAOController.create({
-    data: [
-      mdn.DAOController.create({
-        label: 'Confluence',
-        data: confluenceDAO,
-      }, confluenceCtx),
-      mdn.DAOController.create({
-        label: 'MDN Compat',
-        data: mdnDAO,
-      }, mdnCtx),
-      mdn.DAOController.create({
-        label: 'Confluence/MDN Issues',
-        data: issueDAO,
-      }, issueCtx),
-    ],
-  })).write(document);
+  let view = mdn.MultiDAOControllerView.create({
+    data: mdn.MultiDAOController.create({
+      data: [
+        mdn.DAOController.create({
+          label: 'Confluence',
+          data: confluenceDAO,
+        }, confluenceCtx),
+        mdn.DAOController.create({
+          label: 'MDN Compat',
+          data: mdnDAO,
+        }, mdnCtx),
+        mdn.DAOController.create({
+          label: 'Confluence/MDN Issues',
+          data: issueDAO,
+        }, issueCtx),
+      ],
+      foreignPredicateProviders: [
+        mdn.ConfluenceCompatPredicateProvider.create(),
+      ],
+    }),
+  });
+  view.write(document);
 })();
