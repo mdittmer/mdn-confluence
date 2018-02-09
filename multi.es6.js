@@ -152,6 +152,7 @@
         mdn.DAOController.create({
           label: 'Confluence/MDN Issues',
           data: issueDAO,
+          stack: foam.u2.stack.Stack.create(),
         }, issueCtx),
       ],
       foreignPredicateProviders: [

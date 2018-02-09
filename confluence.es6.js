@@ -26,31 +26,6 @@
       }),
   });
 
-  // foam.CLASS({
-  //   package: 'org.mozilla.mdn',
-  //   name: 'ConfluenceRowFormatter',
-  //   implements: ['foam.u2.RowFormatter'],
-
-  //   methods: [
-  //     function format(data) {
-  //       return `<span>${data ? data.id : ''}</span>`;
-  //     },
-  //   ],
-  // });
-
-
-  /* foam.u2.view.TableView.create({
-   *   of: ConfluenceRow,
-   *   data: confluenceDAO,
-   * }).write(document);*/
-
-
-  /* mdn.ScrollDAOView.create({
-   *   data: confluenceDAO,
-   *   rowFormatter: mdn.ConfluenceRowFormatter.create(),
-   * }).write(document);*/
-
-
   // TODO(markdittmer): Shouldn't these already be in release date order?
   const sortedColumns = [ConfluenceRow.ID].concat(
     ConfluenceRow.getAxiomsByClass(mdn.GridProperty)
@@ -69,68 +44,24 @@
     safaris[safaris.length - 1],
   ];
   /* const selected = [sortedColumns[0]].concat(sortedColumns.slice(-4));*/
-  const ctx = foam.createSubContext({
+
+  const stackView = foam.u2.stack.StackView.create({
+    data: mdn.Stack.create(),
+  }, foam.createSubContext({
     queryParserFactory: x => mdn.parse.ConfluenceQueryParser.create({
       of: ConfluenceRow,
       interpreter: mdn.parse.ReleaseApiConfluenceQueryInterpreter
-	.create(null, x),
+	  .create(null, x),
     }, x),
-  });
-  mdn.DAOControllerView.create({
+  }));
+
+  stackView.write(document);
+
+  stackView.data.push({
+    class: 'org.mozilla.mdn.DAOControllerView',
     selectable,
     selected,
   }, mdn.DAOController.create({
     data: confluenceDAO,
-  }, ctx)).write(document);
-
-  // TODO(markdittmer): Shouldn't these already be in release date order?
-  /* const columns = [ConfluenceRow.ID].concat(
-   *   ConfluenceRow.getAxiomsByClass(mdn.GridProperty)
-   *                .filter(prop => !prop.release.isMobile)
-   *                .sort((prop1, prop2) => prop1.release.releaseDate > prop2.release.releaseDate)
-   *                .slice(-4));
-   * mdn.ScrollDAOTable.create({
-   *   of: ConfluenceRow,
-   *   data: confluenceDAO,
-   *   columns_: cols,
-   *   // data: confluenceDAO,
-   *   // rowFormatter: mdn.ConfluenceRowFormatter.create(),
-   * }).write(document);*/
+  }, stackView));
 })();
-/* var gridDAO = org.chromium.apis.web.GridDAO.create();
- * var dao = foam.dao.PromisedDAO.create({
- *   of: org.mozilla.mdn.GridRow,
- * });
- * var ctlr = org.mozilla.mdn.DAOController.create({
- *   data: dao,
- *   editEnabled: true,
- *   selectEnabled: true,
- *   createEnabled: false,
- *   addEnabled: false,
- * });
- * var ctx = foam.createSubContext({
- *   gridDAO,
- *   data: ctlr,
- *   stack: foam.u2.stack.Stack.create(),
- *   selectedCols: [],
- * });
- * dao.promise = Promise.all([
- *   fetch('data/confluence/org.chromium.apis.web.Release.json')
- *     .then(response => response.json())
- *     .then(json => foam.json.parse(json, org.chromium.apis.web.Release, ctx))
- *     .then(cols => gridDAO.cols = cols),
- *   fetch('data/confluence/org.chromium.apis.web.GridRow.json')
- *     .then(response => response.json())
- *     .then(json => foam.json.parse(json, org.mozilla.mdn.GridRow, ctx))
- *     .then(arr => {
- *       for (const row of arr) {
- *         gridDAO.put(row);
- *       }
- *     })
- * ]).then(() => gridDAO);
- * var view = foam.comics.BrowserView.create({
- *   data: dao,
- *   controller: ctlr,
- *   title: 'GridRows',
- * }, ctx);
- * view.write(document);*/
