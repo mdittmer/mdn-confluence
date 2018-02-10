@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "User support tool for maintaining MDN compatability data using Web API Confluence data.",
   "scripts": {
+    "build": "node main/import.es6.js https://storage.googleapis.com/web-api-confluence-data-cache/latest/json/org.chromium.apis.web.Release.json https://storage.googleapis.com/web-api-confluence-data-cache/latest/json/org.chromium.apis.web.GridRow.json",
     "postinstall": "mkdir -p data/confluence data/issues data/mdn",
     "start": "python -m SimpleHTTPServer",
     "test": "echo \"Error: no test specified\" && exit 1"
