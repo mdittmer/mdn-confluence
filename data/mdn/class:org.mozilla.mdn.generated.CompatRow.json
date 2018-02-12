@@ -1,0 +1,181 @@
+{
+	class:"Model",
+	package:"org.mozilla.mdn.generated",
+	name:"CompatRow",
+	requires:[
+		"org.mozilla.mdn.BrowserInfo"
+	],
+	imports:[
+		"warn"
+	],
+	tableColumns:[
+		"id",
+		"webviewAndroidBrowserInfo",
+		"chromeBrowserInfo",
+		"chromeAndroidBrowserInfo",
+		"edgeBrowserInfo",
+		"edgeMobileBrowserInfo",
+		"firefoxBrowserInfo",
+		"firefoxAndroidBrowserInfo",
+		"ieBrowserInfo",
+		"operaBrowserInfo",
+		"operaAndroidBrowserInfo",
+		"safariBrowserInfo",
+		"safariIosBrowserInfo",
+		"nodejsBrowserInfo"
+	],
+	properties:[
+		{
+			class:"String",
+			name:"id",
+			label:"API",
+			required:true,
+			rawTableCellFormatter:function (value, obj, axiom) {
+              const textValue = value === undefined ? '&nbsp;' : value;
+              return `
+<div class="id">
+  ${textValue}
+  <div class="overlay"><span>${textValue}</span></div>
+</div>
+`;
+            }
+		},
+		{
+			class:"org.mozilla.mdn.BrowserInfoProperty",
+			name:"webviewAndroidBrowserInfo",
+			label:"Webview Android",
+			browserName:"Webview Android"
+		},
+		{
+			class:"org.mozilla.mdn.BrowserInfoProperty",
+			name:"chromeBrowserInfo",
+			label:"Chrome",
+			browserName:"Chrome"
+		},
+		{
+			class:"org.mozilla.mdn.BrowserInfoProperty",
+			name:"chromeAndroidBrowserInfo",
+			label:"Chrome Android",
+			browserName:"Chrome Android"
+		},
+		{
+			class:"org.mozilla.mdn.BrowserInfoProperty",
+			name:"edgeBrowserInfo",
+			label:"Edge",
+			browserName:"Edge"
+		},
+		{
+			class:"org.mozilla.mdn.BrowserInfoProperty",
+			name:"edgeMobileBrowserInfo",
+			label:"Edge Mobile",
+			browserName:"Edge Mobile"
+		},
+		{
+			class:"org.mozilla.mdn.BrowserInfoProperty",
+			name:"firefoxBrowserInfo",
+			label:"Firefox",
+			browserName:"Firefox"
+		},
+		{
+			class:"org.mozilla.mdn.BrowserInfoProperty",
+			name:"firefoxAndroidBrowserInfo",
+			label:"Firefox Android",
+			browserName:"Firefox Android"
+		},
+		{
+			class:"org.mozilla.mdn.BrowserInfoProperty",
+			name:"ieBrowserInfo",
+			label:"Ie",
+			browserName:"Ie"
+		},
+		{
+			class:"org.mozilla.mdn.BrowserInfoProperty",
+			name:"operaBrowserInfo",
+			label:"Opera",
+			browserName:"Opera"
+		},
+		{
+			class:"org.mozilla.mdn.BrowserInfoProperty",
+			name:"operaAndroidBrowserInfo",
+			label:"Opera Android",
+			browserName:"Opera Android"
+		},
+		{
+			class:"org.mozilla.mdn.BrowserInfoProperty",
+			name:"safariBrowserInfo",
+			label:"Safari",
+			browserName:"Safari"
+		},
+		{
+			class:"org.mozilla.mdn.BrowserInfoProperty",
+			name:"safariIosBrowserInfo",
+			label:"Safari Ios",
+			browserName:"Safari Ios"
+		},
+		{
+			class:"org.mozilla.mdn.BrowserInfoProperty",
+			name:"nodejsBrowserInfo",
+			label:"Nodejs",
+			browserName:"Nodejs"
+		}
+	],
+	methods:[
+		{
+			name:"fromMdnData",
+			code:function fromMdnData(data) {
+              const compatMap = data.__compat.support;
+              let compatKeys = Object.keys(compatMap);
+              for (const key of compatKeys) {
+                if (!compatMap[key].version_added &&
+                    !compatMap[key].version_removed) {
+                  continue;
+                }
+                let versionAdded = compatMap[key].version_added ?
+                      compatMap[key].version_added === true ?
+                      0 :
+                      parseFloat(compatMap[key].version_added) :
+                      Infinity;
+                let versionRemoved = compatMap[key].version_removed ?
+                      parseFloat(compatMap[key].version_removed) :
+                      Infinity;
+
+                if (Number.isNaN(versionAdded)) {
+                  this.warn(`Version added for ${this.id} ${key}: ${compatMap[key].version_added} NaN`);
+                  versionAdded = Infinity;
+                }
+                if (Number.isNaN(versionRemoved)) {
+                  this.warn(`Version removed for ${this.id} ${key}: ${compatMap[key].version_removed} NaN`);
+                  versionRemoved = Infinity;
+                }
+
+                const prop = this.cls_.getAxiomByName(
+                    this.propNameFromMdnKey(key));
+                prop.set(this, this.BrowserInfo.create({
+                  versionAdded,
+                  versionRemoved,
+                }));
+              }
+              return this;
+            }
+		},
+		{
+			name:"browserNameFromMdnKey",
+			code:function browserNameFromMdnKey(key) {
+      const parts = key.split('_');
+      return parts.map(p => p.charAt(0).toUpperCase() + p.substr(1))
+          .join(' ');
+    }
+		},
+		{
+			name:"propNameFromMdnKey",
+			code:function propNameFromMdnKey(key) {
+      let parts = key.split('_');
+      const first = parts.shift();
+      return first + parts.map(p => p.charAt(0).toUpperCase() +
+                               p.substr(1))
+          .join('') + 'BrowserInfo';
+    }
+		}
+	],
+	id:"org.mozilla.mdn.generated.CompatRow"
+}

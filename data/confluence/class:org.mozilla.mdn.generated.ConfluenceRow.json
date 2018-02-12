@@ -1,0 +1,1199 @@
+{
+	class:"Model",
+	package:"org.mozilla.mdn.generated",
+	name:"ConfluenceRow",
+	requires:[
+		"org.mozilla.mdn.GridProperty"
+	],
+	properties:[
+		{
+			class:"String",
+			name:"id",
+			label:"API",
+			required:true,
+			rawTableCellFormatter:function (value, obj, axiom) {
+              const textValue = value === undefined ? '&nbsp;' : value;
+              return `
+<div class="id">
+  ${textValue}
+  <div class="overlay"><span>${textValue}</span></div>
+</div>
+`;
+            }
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"safari5_1_5oSX10_7_5",
+			label:"Safari 5.1.5 OSX 10.7.5",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Safari",
+				browserVersion: "5.1.5",
+				osName: "OSX",
+				osVersion: "10.7.5",
+				releaseDate: 1336521600000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"safari6_0_5oSX10_7_5",
+			label:"Safari 6.0.5 OSX 10.7.5",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Safari",
+				browserVersion: "6.0.5",
+				osName: "OSX",
+				osVersion: "10.7.5",
+				releaseDate: 1343174400000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"safari6_2_8oSX10_8_5",
+			label:"Safari 6.2.8 OSX 10.8.5",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Safari",
+				browserVersion: "6.2.8",
+				osName: "OSX",
+				osVersion: "10.8.5",
+				releaseDate: 1410998400000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"safari7_1_8oSX10_9_5",
+			label:"Safari 7.1.8 OSX 10.9.5",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Safari",
+				browserVersion: "7.1.8",
+				osName: "OSX",
+				osVersion: "10.9.5",
+				releaseDate: 1411084800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"safari8_0_8oSX10_10_5",
+			label:"Safari 8.0.8 OSX 10.10.5",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Safari",
+				browserVersion: "8.0.8",
+				osName: "OSX",
+				osVersion: "10.10.5",
+				releaseDate: 1413417600000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome40_0_2214_93oSX10_11_6",
+			label:"Chrome 40.0.2214.93 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "40.0.2214.93",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1421712000000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome40_0_2214_93windows10_0",
+			label:"Chrome 40.0.2214.93 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "40.0.2214.93",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1421712000000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome41_0_2272_89windows10_0",
+			label:"Chrome 41.0.2272.89 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "41.0.2272.89",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1425340800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome41_0_2272_76oSX10_11_6",
+			label:"Chrome 41.0.2272.76 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "41.0.2272.76",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1425340800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome42_0_2311_135oSX10_11_6",
+			label:"Chrome 42.0.2311.135 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "42.0.2311.135",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1428969600000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome42_0_2311_135windows10_0",
+			label:"Chrome 42.0.2311.135 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "42.0.2311.135",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1428969600000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome43_0_2357_65oSX10_11_6",
+			label:"Chrome 43.0.2357.65 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "43.0.2357.65",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1431993600000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome43_0_2357_81windows10_0",
+			label:"Chrome 43.0.2357.81 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "43.0.2357.81",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1431993600000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome44_0_2403_89oSX10_11_6",
+			label:"Chrome 44.0.2403.89 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "44.0.2403.89",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1437436800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome44_0_2403_89windows10_0",
+			label:"Chrome 44.0.2403.89 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "44.0.2403.89",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1437436800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome45_0_2454_85windows10_0",
+			label:"Chrome 45.0.2454.85 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "45.0.2454.85",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1441065600000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome45_0_2454_85oSX10_11_6",
+			label:"Chrome 45.0.2454.85 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "45.0.2454.85",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1441065600000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome46_0_2490_71oSX10_11_6",
+			label:"Chrome 46.0.2490.71 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "46.0.2490.71",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1444694400000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome46_0_2490_71windows10_0",
+			label:"Chrome 46.0.2490.71 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "46.0.2490.71",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1444694400000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"edge13_10586windows10_0",
+			label:"Edge 13.10586 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Edge",
+				browserVersion: "13.10586",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1446681600000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome47_0_2526_73oSX10_11_6",
+			label:"Chrome 47.0.2526.73 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "47.0.2526.73",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1448928000000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome47_0_2526_73windows10_0",
+			label:"Chrome 47.0.2526.73 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "47.0.2526.73",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1448928000000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome48_0_2564_97windows10_0",
+			label:"Chrome 48.0.2564.97 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "48.0.2564.97",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1453248000000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome48_0_2564_97oSX10_11_6",
+			label:"Chrome 48.0.2564.97 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "48.0.2564.97",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1453248000000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome49_0_2623_75windows10_0",
+			label:"Chrome 49.0.2623.75 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "49.0.2623.75",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1456876800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome49_0_2623_75oSX10_11_6",
+			label:"Chrome 49.0.2623.75 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "49.0.2623.75",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1456876800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox45_0oSX10_11",
+			label:"Firefox 45.0 OSX 10.11",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "45.0",
+				osName: "OSX",
+				osVersion: "10.11",
+				releaseDate: 1457395200000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox45_0windows10_0",
+			label:"Firefox 45.0 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "45.0",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1457395200000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"safari9_1_3oSX10_11_6",
+			label:"Safari 9.1.3 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Safari",
+				browserVersion: "9.1.3",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1458604800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome50_0_2661_75oSX10_11_6",
+			label:"Chrome 50.0.2661.75 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "50.0.2661.75",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1460505600000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome50_0_2661_75windows10_0",
+			label:"Chrome 50.0.2661.75 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "50.0.2661.75",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1460505600000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox46_0oSX10_11",
+			label:"Firefox 46.0 OSX 10.11",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "46.0",
+				osName: "OSX",
+				osVersion: "10.11",
+				releaseDate: 1461628800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox46_0windows10_0",
+			label:"Firefox 46.0 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "46.0",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1461628800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome51_0_2704_79windows10_0",
+			label:"Chrome 51.0.2704.79 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "51.0.2704.79",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1464134400000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome51_0_2704_79oSX10_11_6",
+			label:"Chrome 51.0.2704.79 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "51.0.2704.79",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1464134400000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox47_0windows10_0",
+			label:"Firefox 47.0 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "47.0",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1465257600000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox47_0oSX10_11",
+			label:"Firefox 47.0 OSX 10.11",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "47.0",
+				osName: "OSX",
+				osVersion: "10.11",
+				releaseDate: 1465257600000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome52_0_2743_82windows10_0",
+			label:"Chrome 52.0.2743.82 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "52.0.2743.82",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1468972800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome52_0_2743_82oSX10_11_6",
+			label:"Chrome 52.0.2743.82 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "52.0.2743.82",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1468972800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox48_0oSX10_11",
+			label:"Firefox 48.0 OSX 10.11",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "48.0",
+				osName: "OSX",
+				osVersion: "10.11",
+				releaseDate: 1470096000000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox48_0windows10_0",
+			label:"Firefox 48.0 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "48.0",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1470096000000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"edge14_14393windows10_0",
+			label:"Edge 14.14393 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Edge",
+				browserVersion: "14.14393",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1470096000000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"uC11_0_0_818android6_0_1",
+			label:"UC 11.0.0.818 Android 6.0.1",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "UC",
+				browserVersion: "11.0.0.818",
+				osName: "Android",
+				osVersion: "6.0.1",
+				releaseDate: 1470182400000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome53_0_2785_89oSX10_11_6",
+			label:"Chrome 53.0.2785.89 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "53.0.2785.89",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1472601600000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome53_0_2785_113windows10_0",
+			label:"Chrome 53.0.2785.113 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "53.0.2785.113",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1472601600000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox49_0oSX10_11",
+			label:"Firefox 49.0 OSX 10.11",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "49.0",
+				osName: "OSX",
+				osVersion: "10.11",
+				releaseDate: 1474329600000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox49_0windows10_0",
+			label:"Firefox 49.0 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "49.0",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1474329600000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"uC11_0_8_858android6_0_1",
+			label:"UC 11.0.8.858 Android 6.0.1",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "UC",
+				browserVersion: "11.0.8.858",
+				osName: "Android",
+				osVersion: "6.0.1",
+				releaseDate: 1474416000000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome54_0_2840_59oSX10_11_6",
+			label:"Chrome 54.0.2840.59 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "54.0.2840.59",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1476230400000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome54_0_2840_59windows10_0",
+			label:"Chrome 54.0.2840.59 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "54.0.2840.59",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1476230400000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"uC11_1_0_870android6_0_1",
+			label:"UC 11.1.0.870 Android 6.0.1",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "UC",
+				browserVersion: "11.1.0.870",
+				osName: "Android",
+				osVersion: "6.0.1",
+				releaseDate: 1476403200000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"uC11_1_5_871android6_0_1",
+			label:"UC 11.1.5.871 Android 6.0.1",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "UC",
+				browserVersion: "11.1.5.871",
+				osName: "Android",
+				osVersion: "6.0.1",
+				releaseDate: 1478044800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox50_0oSX10_11",
+			label:"Firefox 50.0 OSX 10.11",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "50.0",
+				osName: "OSX",
+				osVersion: "10.11",
+				releaseDate: 1479168000000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox50_0windows10_0",
+			label:"Firefox 50.0 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "50.0",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1479168000000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"uC11_2_0_880android6_0_1",
+			label:"UC 11.2.0.880 Android 6.0.1",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "UC",
+				browserVersion: "11.2.0.880",
+				osName: "Android",
+				osVersion: "6.0.1",
+				releaseDate: 1479427200000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome55_0_2883_75windows10_0",
+			label:"Chrome 55.0.2883.75 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "55.0.2883.75",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1480550400000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome55_0_2883_75oSX10_11_6",
+			label:"Chrome 55.0.2883.75 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "55.0.2883.75",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1480550400000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"uC11_2_8_885android6_0_1",
+			label:"UC 11.2.8.885 Android 6.0.1",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "UC",
+				browserVersion: "11.2.8.885",
+				osName: "Android",
+				osVersion: "6.0.1",
+				releaseDate: 1482364800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"uC11_3_0_907android6_0_1",
+			label:"UC 11.3.0.907 Android 6.0.1",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "UC",
+				browserVersion: "11.3.0.907",
+				osName: "Android",
+				osVersion: "6.0.1",
+				releaseDate: 1483401600000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox51_0oSX10_11",
+			label:"Firefox 51.0 OSX 10.11",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "51.0",
+				osName: "OSX",
+				osVersion: "10.11",
+				releaseDate: 1485216000000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox51_0windows10_0",
+			label:"Firefox 51.0 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "51.0",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1485216000000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome56_0_2924_87windows10_0",
+			label:"Chrome 56.0.2924.87 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "56.0.2924.87",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1485302400000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome56_0_2924_76oSX10_11_6",
+			label:"Chrome 56.0.2924.76 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "56.0.2924.76",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1485302400000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox52_0oSX10_11",
+			label:"Firefox 52.0 OSX 10.11",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "52.0",
+				osName: "OSX",
+				osVersion: "10.11",
+				releaseDate: 1488844800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox52_0windows10_0",
+			label:"Firefox 52.0 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "52.0",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1488844800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome57_0_2987_110windows10_0",
+			label:"Chrome 57.0.2987.110 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "57.0.2987.110",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1489017600000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome57_0_2987_98oSX10_11_6",
+			label:"Chrome 57.0.2987.98 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "57.0.2987.98",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1489017600000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"safari10_1_2oSX10_12_6",
+			label:"Safari 10.1.2 OSX 10.12.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Safari",
+				browserVersion: "10.1.2",
+				osName: "OSX",
+				osVersion: "10.12.6",
+				releaseDate: 1490572800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"edge15_15063windows10_0",
+			label:"Edge 15.15063 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Edge",
+				browserVersion: "15.15063",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1491868800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome58_0_3029_81oSX10_11_6",
+			label:"Chrome 58.0.3029.81 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "58.0.3029.81",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1492560000000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome58_0_3029_81windows10_0",
+			label:"Chrome 58.0.3029.81 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "58.0.3029.81",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1492560000000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox53_0windows10_0",
+			label:"Firefox 53.0 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "53.0",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1492560000000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox53_0oSX10_11",
+			label:"Firefox 53.0 OSX 10.11",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "53.0",
+				osName: "OSX",
+				osVersion: "10.11",
+				releaseDate: 1492560000000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome59_0_3071_86oSX10_11_6",
+			label:"Chrome 59.0.3071.86 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "59.0.3071.86",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1496620800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome59_0_3071_86windows10_0",
+			label:"Chrome 59.0.3071.86 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "59.0.3071.86",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1496620800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox54_0windows10_0",
+			label:"Firefox 54.0 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "54.0",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1497312000000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox54_0oSX10_11",
+			label:"Firefox 54.0 OSX 10.11",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "54.0",
+				osName: "OSX",
+				osVersion: "10.11",
+				releaseDate: 1497312000000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome60_0_3112_78windows10_0",
+			label:"Chrome 60.0.3112.78 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "60.0.3112.78",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1500940800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome60_0_3112_78oSX10_11_6",
+			label:"Chrome 60.0.3112.78 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "60.0.3112.78",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1500940800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox55_0windows10_0",
+			label:"Firefox 55.0 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "55.0",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1502150400000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox55_0oSX10_11",
+			label:"Firefox 55.0 OSX 10.11",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "55.0",
+				osName: "OSX",
+				osVersion: "10.11",
+				releaseDate: 1502150400000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome61_0_3163_79oSX10_11_6",
+			label:"Chrome 61.0.3163.79 OSX 10.11.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "61.0.3163.79",
+				osName: "OSX",
+				osVersion: "10.11.6",
+				releaseDate: 1504569600000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome61_0_3163_79windows10_0",
+			label:"Chrome 61.0.3163.79 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "61.0.3163.79",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1504569600000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"safari11_0oSX10_12_6",
+			label:"Safari 11.0 OSX 10.12.6",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Safari",
+				browserVersion: "11.0",
+				osName: "OSX",
+				osVersion: "10.12.6",
+				releaseDate: 1505779200000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"edge16_16299windows10_0",
+			label:"Edge 16.16299 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Edge",
+				browserVersion: "16.16299",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1506384000000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox56_0windows10_0",
+			label:"Firefox 56.0 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "56.0",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1506556800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"firefox56_0oSX10_11",
+			label:"Firefox 56.0 OSX 10.11",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Firefox",
+				browserVersion: "56.0",
+				osName: "OSX",
+				osVersion: "10.11",
+				releaseDate: 1506556800000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome62_0_3202_62windows10_0",
+			label:"Chrome 62.0.3202.62 Windows 10.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "62.0.3202.62",
+				osName: "Windows",
+				osVersion: "10.0",
+				releaseDate: 1508198400000
+			}
+		},
+		{
+			class:"org.mozilla.mdn.GridProperty",
+			name:"chrome62_0_3202_62oSX10_13_0",
+			label:"Chrome 62.0.3202.62 OSX 10.13.0",
+			release:{
+				class: "org.chromium.apis.web.Release",
+				browserName: "Chrome",
+				browserVersion: "62.0.3202.62",
+				osName: "OSX",
+				osVersion: "10.13.0",
+				releaseDate: 1508198400000
+			}
+		}
+	],
+	methods:[
+		{
+			name:"fromGridRow",
+			code:function (gridRow) {
+              this.id = gridRow.id;
+              const data = gridRow.data;
+              const props = this.cls_.getAxiomsByClass(this.GridProperty);
+              foam.assert(props.length === data.length,
+                          'Confluence data: Boolean array mismatch');
+              for (let i = 0; i < data.length; i++) {
+                props[i].set(this, data[i]);
+              }
+              return this;
+            }
+		}
+	],
+	id:"org.mozilla.mdn.generated.ConfluenceRow"
+}
