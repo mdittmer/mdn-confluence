@@ -1,0 +1,28 @@
+{
+    "boss": true,
+    "eqeqeq": true,
+    "eqnull": true,
+    "expr": true,
+    "immed": true,
+    "noarg": true,
+    "smarttabs": true,
+    "trailing": true,
+    "undef": true,
+    "unused": true,
+    "shadow": true,
+    "unused": false,
+
+    "proto": true,
+
+    "globals": {
+      "console": true,
+      "describe": true,
+      "beforeEach": true,
+      "afterEach": true,
+      "expect": true,
+      "foam": true,
+      "global": true,
+      "it": true,
+      "require": true
+    }
+}
