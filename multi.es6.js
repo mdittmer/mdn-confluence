@@ -6,7 +6,7 @@
   // Confluence
   //
 
-  const confluenceRowSpecFetch = await fetch('data/confluence/class:org.mozilla.mdn.generated.ConfluenceRow.json');
+  const confluenceRowSpecFetch = await fetch('data/confluence/class:org.mozilla.mdn.generated.ConfluenceRow.txt');
   const confluenceRowSpecText = await confluenceRowSpecFetch.text();
   const confluenceRowModel = foam.json.parseString(confluenceRowSpecText);
   confluenceRowModel.validate();
@@ -65,7 +65,7 @@
   // MDN compat
   //
 
-  const mdnRowSpecFetch = await fetch('data/mdn/class:org.mozilla.mdn.generated.CompatRow.json');
+  const mdnRowSpecFetch = await fetch('data/mdn/class:org.mozilla.mdn.generated.CompatRow.txt');
   const mdnRowSpecText = await mdnRowSpecFetch.text();
   const compatRowModel = foam.json.parseString(mdnRowSpecText);
   compatRowModel.validate();
