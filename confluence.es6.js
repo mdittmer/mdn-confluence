@@ -46,7 +46,7 @@
   /* const selected = [sortedColumns[0]].concat(sortedColumns.slice(-4));*/
 
   const stackView = foam.u2.stack.StackView.create({
-    data: mdn.Stack.create(),
+    data: foam.u2.stack.Stack.create(),
   }, foam.createSubContext({
     queryParserFactory: x => mdn.parse.ConfluenceQueryParser.create({
       of: ConfluenceRow,
