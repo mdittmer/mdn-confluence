@@ -5,7 +5,7 @@ These tools are intended for MDN Compat Data curators to leverage
 
 ## Installing, building, running locally
 
-    npm install && npm run build && npm run serve
+    npm install && npm run build && npm run start
 
 Since this simply serves static assets, it assumes that
 `python -m SimpleHTTPServer` will sucessfully start an HTTP server on your
