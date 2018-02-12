@@ -2,7 +2,7 @@
   const chr = org.chromium.apis.web;
   const mdn = org.mozilla.mdn;
 
-  const rowSpecFetch = await fetch('data/confluence/class:org.mozilla.mdn.generated.ConfluenceRow.json');
+  const rowSpecFetch = await fetch('data/confluence/class:org.mozilla.mdn.generated.ConfluenceRow.txt');
   const rowSpecText = await rowSpecFetch.text();
   const confluenceRowModel = foam.json.parseString(rowSpecText);
   confluenceRowModel.validate();

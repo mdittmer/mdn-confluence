@@ -75,8 +75,10 @@ const foamStore = (dataDir, src, opt_name, opt_outputter) => {
   foam.assert(cls || opt_name, 'foamStore: Must specify class or name');
   logger.info(`Storing ${opt_name ? opt_name : cls.id}`);
   return new Promise((resolve, reject) => {
+    const name = opt_name || cls.id;
+    const xtn = name.startsWith('class:') ? 'txt' : 'json';
     fs.writeFile(
-        `${__dirname}/../data/${dataDir}/${opt_name || cls.id}.json`,
+        `${__dirname}/../data/${dataDir}/${name}.${xtn}`,
         (opt_outputter || outputter).stringify(src, cls),
         error => {
           if (error) {

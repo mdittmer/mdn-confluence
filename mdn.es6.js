@@ -3,7 +3,7 @@ var mdnDAO;
   const chr = org.chromium.apis.web;
   const mdn = org.mozilla.mdn;
 
-  const rowSpecFetch = await fetch('data/mdn/class:org.mozilla.mdn.generated.CompatRow.json');
+  const rowSpecFetch = await fetch('data/mdn/class:org.mozilla.mdn.generated.CompatRow.txt');
   const rowSpecText = await rowSpecFetch.text();
   const compatRowModel = foam.json.parseString(rowSpecText);
   compatRowModel.validate();
