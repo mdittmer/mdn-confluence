@@ -1,3 +1,4 @@
 node_modules
-data
+public/data
+public/third_party
 _site
