@@ -19,12 +19,12 @@ require('../node_modules/web-api-confluence-dashboard/lib/web_apis/release.es6.j
 require('../node_modules/web-api-confluence-dashboard/lib/web_apis/release_interface_relationship.es6.js');
 require('../node_modules/web-api-confluence-dashboard/lib/web_apis/web_interface.es6.js');
 
-require('../lib/org/mozilla/mdn/property.es6.js');
-require('../lib/org/mozilla/mdn/GridProperty.es6.js');
-require('../lib/org/mozilla/mdn/BrowserInfo.es6.js');
-require('../lib/org/mozilla/mdn/BrowserInfoProperty.es6.js');
-require('../lib/org/mozilla/mdn/CompatClassGenerator.es6.js');
-require('../lib/org/mozilla/mdn/ConfluenceClassGenerator.es6.js');
+require('../public/lib/org/mozilla/mdn/property.es6.js');
+require('../public/lib/org/mozilla/mdn/GridProperty.es6.js');
+require('../public/lib/org/mozilla/mdn/BrowserInfo.es6.js');
+require('../public/lib/org/mozilla/mdn/BrowserInfoProperty.es6.js');
+require('../public/lib/org/mozilla/mdn/CompatClassGenerator.es6.js');
+require('../public/lib/org/mozilla/mdn/ConfluenceClassGenerator.es6.js');
 
 const chr = org.chromium.apis.web;
 const mdn = org.mozilla.mdn;
@@ -78,7 +78,7 @@ const foamStore = (dataDir, src, opt_name, opt_outputter) => {
     const name = opt_name || cls.id;
     const xtn = name.startsWith('class:') ? 'txt' : 'json';
     fs.writeFile(
-        `${__dirname}/../data/${dataDir}/${name}.${xtn}`,
+        `${__dirname}/../public/data/${dataDir}/${name}.${xtn}`,
         (opt_outputter || outputter).stringify(src, cls),
         error => {
           if (error) {
@@ -221,10 +221,10 @@ let issueDAO;
     })(),
   ]);
 })().then(async function() {
-  require('../lib/org/mozilla/mdn/IssueType.es6.js');
-  require('../lib/org/mozilla/mdn/IssueStatus.es6.js');
-  require('../lib/org/mozilla/mdn/Issue.es6.js');
-  require('../lib/org/mozilla/mdn/VersionIssueGenerator.es6.js');
+  require('../public/lib/org/mozilla/mdn/IssueType.es6.js');
+  require('../public/lib/org/mozilla/mdn/IssueStatus.es6.js');
+  require('../public/lib/org/mozilla/mdn/Issue.es6.js');
+  require('../public/lib/org/mozilla/mdn/VersionIssueGenerator.es6.js');
 
   issueDAO = await mdn.VersionIssueGenerator.create()
       .generateIssues(confluenceDAO, mdnDAO, foam.dao.MDAO.create({
