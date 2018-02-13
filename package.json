@@ -11,6 +11,7 @@
   },
   "author": "Mark Dittmer",
   "dependencies": {
+    "@google-cloud/firestore": "^0.11.2",
     "foam2": "git://github.com/foam-framework/foam2.git#mdn-confluence",
     "mdn-browser-compat-data": "git://github.com/mdn/browser-compat-data.git",
     "web-api-confluence-dashboard": "git://github.com/mdittmer/confluence.git#mdn"
