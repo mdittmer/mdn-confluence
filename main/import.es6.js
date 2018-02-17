@@ -4,10 +4,58 @@
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
 const process = require('process');
 const url = require('url');
 
+const argv = require('yargs')
+      .help('h')
+      .option('confluence-release-url', {
+        alias: 'cru',
+        desc: `Absolute https: or file: URL to JSON for Confluence release metadata for GridRows`,
+        default: `https://storage.googleapis.com/web-api-confluence-data-cache/latest/json/org.chromium.apis.web.Release.json`,
+        coerce: cru => {
+          if (!/^(https|file):[/][/]/i.test(cru)) {
+            throw new Error('Invalid confluence-release-url: ${cru}');
+          }
+          return cru;
+        },
+      })
+      .option('confluence-data-url', {
+        alias: 'cdu',
+        desc: `Absolute https: or file: URL to JSON for Confluence GridRows`,
+        default: `https://storage.googleapis.com/web-api-confluence-data-cache/latest/json/org.chromium.apis.web.GridRow.json`,
+        coerce: cdu => {
+          if (!/^(https|file):[/][/]/i.test(cdu)) {
+            throw new Error('Invalid confluence-data-url: ${cdu}');
+          }
+          return cdu;
+        },
+      })
+      .option('update-confluence-data', {
+        type: 'boolean',
+        desc: `Update Confluence data from given URLs`,
+        default: false,
+      })
+      .option('update-mdn-data', {
+        type: 'boolean',
+        desc: `Update MDN compat data from node_modules/mdn-browser-compat-data`,
+        default: true,
+      })
+      .option('update-issues', {
+        type: 'boolean',
+        desc: `Update programmatically generated issues from Confluence/MDN inconsistencies`,
+        default: true,
+      })
+      .option('clobber-issues', {
+        type: 'boolean',
+        desc: `Clobber existing issues. WARNING: THIS WILL OVERWRITE EXISTING ISSUE STATE!`,
+        default: false,
+      })
+      .argv;
+
+const dateID = (new Date()).toISOString();
+
+global.FOAM_FLAGS = {firebase: true};
 require('foam2');
 
 // TODO(markdittmer): Better expose Confluence modules.
@@ -20,83 +68,59 @@ require('../node_modules/web-api-confluence-dashboard/lib/web_apis/release_inter
 require('../node_modules/web-api-confluence-dashboard/lib/web_apis/web_interface.es6.js');
 
 require('../public/lib/org/mozilla/mdn/property.es6.js');
+require('../public/lib/org/mozilla/mdn/Version.es6.js');
 require('../public/lib/org/mozilla/mdn/GridProperty.es6.js');
 require('../public/lib/org/mozilla/mdn/BrowserInfo.es6.js');
 require('../public/lib/org/mozilla/mdn/BrowserInfoProperty.es6.js');
 require('../public/lib/org/mozilla/mdn/CompatClassGenerator.es6.js');
 require('../public/lib/org/mozilla/mdn/ConfluenceClassGenerator.es6.js');
 
+const projectId = process.env.GCLOUD_PROJECT || 'mdn-confluence';
+const Firestore = require('@google-cloud/firestore');
+const firestore = new Firestore({
+  projectId,
+  keyFilename: `${__dirname}/../.local/credentials.json`,
+});
+
 const chr = org.chromium.apis.web;
 const mdn = org.mozilla.mdn;
 
 const logger = foam.log.ConsoleLogger.create();
 
-const USAGE = `USAGE:
-
-    node /path/to/import.es6.js ConfluenceReleaseURL ConfluenceDataURL
-
-        ConfluenceReleaseURL = absolute https: or file: URL to JSON for
-                               Confluence release metadata for GridRows.
-        ConfluenceDataURL = absolute https: or file: URL to JSON for Confluence
-                            GridRows.`;
-if (process.argv.length !== 4) {
-  console.error(USAGE);
-  process.exit(1);
-}
-
-const releaseUrl = url.parse(process.argv[2]);
-if (releaseUrl.protocol !== 'file:' && releaseUrl.protocol !== 'https:') {
-  console.error('ConfluenceReleaseURL parameter must be file: or https: URL');
-}
-const dataUrl = url.parse(process.argv[3]);
-if (dataUrl.protocol !== 'file:' && dataUrl.protocol !== 'https:') {
-  console.error('ConfluenceDataURL parameter must be file: or https: URL');
-}
+const releaseUrl = url.parse(argv.cru);
+const dataUrl = url.parse(argv.cdu);
 
 const releaseDAO = releaseUrl.protocol === 'file:' ?
-      chr.SerializableLocalJsonDAO.create({of: chr.Release, path: releaseUrl.pathname}) :
-      chr.SerializableHttpJsonDAO.create({of: chr.Release, url: url.format(releaseUrl)});
-
-
-const outputter = foam.json.Outputter.create({
-  pretty: true,
-  formatDatesAsNumbers: true,
-  outputDefaultValues: false,
-  useShortNames: false,
-  strict: true,
-});
-const foamStore = (dataDir, src, opt_name, opt_outputter) => {
-  let cls = src.cls_;
-  if (foam.dao.ArraySink.isInstance(src)) {
-    cls = src.of || src.array[0] ? src.array[0].cls_ :
-        foam.core.FObject;
-    src = src.array;
-  }
-  foam.assert(cls || opt_name, 'foamStore: Must specify class or name');
-  logger.info(`Storing ${opt_name ? opt_name : cls.id}`);
-  return new Promise((resolve, reject) => {
-    const name = opt_name || cls.id;
-    const xtn = name.startsWith('class:') ? 'txt' : 'json';
-    fs.writeFile(
-        `${__dirname}/../public/data/${dataDir}/${name}.${xtn}`,
-        (opt_outputter || outputter).stringify(src, cls),
-        error => {
-          if (error) {
-            logger.error(`Error storing ${opt_name ? opt_name : cls.id}`,
-                         error);
-            reject(error);
-          } else {
-            logger.info(`Stored ${opt_name ? opt_name : cls.id}`);
-            resolve();
-          }
-        });
-  });
-};
+      chr.SerializableLocalJsonDAO.create({
+        of: chr.Release,
+        path: releaseUrl.pathname,
+      }) :
+      chr.SerializableHttpJsonDAO.create({
+        of: chr.Release,
+        url: url.format(releaseUrl),
+        safePathPrefixes: [`/${projectId}.appspot.com/`],
+      });
 
 let confluenceDAO;
 let mdnDAO;
-let issueDAO;
+let issuesDAO;
+let latests;
 (async function() {
+  //
+  // Establish latest version of versioned collections.
+  //
+  const latestCollection = firestore.collection('latest');
+  const latestDAO = com.google.firebase.FirestoreDAO.create({
+    of: mdn.Version,
+    firestore,
+    collection: latestCollection,
+  });
+  const latestSink = await latestDAO.select();
+  latests = latestSink.array.reduce((acc, latest) => acc[latest.id] = latest, {});
+
+  //
+  // Generate Confluence class.
+  //
   const releaseSink = await releaseDAO.orderBy(chr.Release.RELEASE_DATE).select();
   const releases = releaseSink.array;
 
@@ -112,9 +136,101 @@ let issueDAO;
   const ConfluenceRow = confluenceClassGenerator.
         generateClass(confluenceRowSpec);
 
+  //
+  // Generate MDN/Compat class.
+  //
+  const mdnData = require('mdn-browser-compat-data');
+
+  const getBrowserName = mdn.CompatClassGenerator
+        .getAxiomByName('browserNameFromMdnKey').code;
+  const getPropName = mdn.CompatClassGenerator
+        .getAxiomByName('propNameFromMdnKey').code;
+
+  const mdnApis = Object.assign(
+      {}, mdnData.api, mdnData.javascript.builtins);
+
+  let browserInfoPropMap = {};
+  for (const iface of Object.keys(mdnApis)) {
+    if (iface.indexOf('__') !== -1) continue;
+    for (const api of Object.keys(mdnApis[iface])) {
+      if (/[^a-z]/i.test(api) ||
+          !(mdnApis[iface][api].__compat &&
+            mdnApis[iface][api].__compat.support)) {
+        continue;
+      }
+      const keys = Object.keys(mdnApis[iface][api].__compat.support);
+      for (const key of keys) {
+        if (browserInfoPropMap[key]) continue;
+        const browserName = getBrowserName(key);
+        browserInfoPropMap[key] = {
+          class: 'org.mozilla.mdn.BrowserInfoProperty',
+          name: getPropName(key),
+          label: browserName,
+          browserName: browserName,
+        };
+      }
+    }
+  }
+  let browserInfoProps = [];
+  for (const key of Object.keys(browserInfoPropMap)) {
+    browserInfoProps.push(browserInfoPropMap[key]);
+  }
+  const compatClassGenerator =
+        mdn.CompatClassGenerator.create();
+  const compatRowSpec = compatClassGenerator
+        .generateSpec('org.mozilla.mdn.generated', 'CompatRow', browserInfoProps);
+  const CompatRow = compatClassGenerator.
+        generateClass(compatRowSpec);
+
+  //
+  // Establish Firebase collections and DAOs for Confluence, MDN/Compat, Issues.
+  //
+  const confluenceVersion = argv.updateConfluenceData || !latests.confluence ?
+        dateID : latests.confluence.version;
+  if (!argv.updateConfluenceData && !latests.confluence) {
+    logger.warn(`No latest Confluence data found; updating`);
+  }
+  const confluenceCollection = firestore.collection(`confluence_${confluenceVersion}`);
+
+  const mdnVersion = argv.updateMdnData || !latests.mdn ?
+        dateID : latests.mdn.version;
+  if (!argv.updateMdnData && !latests.mdn) {
+    logger.warn(`No latest MDN data found; updating`);
+  }
+  const mdnCollection = firestore.collection(`mdn_${mdnVersion}`);
+
+  const issuesCollection = firestore.collection('issues');
+
+  confluenceDAO = com.google.firebase.FirestoreDAO.create({
+    of: ConfluenceRow,
+    firestore,
+    collection: confluenceCollection,
+  });
+  mdnDAO = com.google.firebase.FirestoreDAO.create({
+    of: CompatRow,
+    firestore,
+    collection: mdnCollection,
+  });
+  issuesDAO = com.google.firebase.FirestoreDAO.create({
+    of: mdn.Issue,
+    firestore,
+    collection: issuesCollection,
+  });
+
+  //
+  // Edge case: Setup latests if they're missing
+  //
+  latests.confluence = latests.confluence ||
+      mdn.Version.create({id: 'confluence'});
+  latests.mdn = latests.mdn ||
+      mdn.Version.create({id: 'mdn'});
+
   return Promise.all([
+    //
+    // Confluence update
+    //
     (async function() {
-      confluenceDAO = foam.dao.MDAO.create({of: ConfluenceRow});
+      if (!argv.updateConfluenceData) return Promise.resolve();
 
       const gridDAO = chr.GridDAO.create({
         cols: releases,
@@ -127,38 +243,20 @@ let issueDAO;
 
       const rowSink = await gridDAO.select();
       const confluenceApis = rowSink.array;
-      logger.info(`${confluenceApis.length} API rows from Confluence`);
-
-      for (const api of confluenceApis) {
-        confluenceDAO.put(ConfluenceRow.create(null, ctx).fromGridRow(api));
-      }
-
-      const confluenceRows = await confluenceDAO.select(
-          foam.dao.ArraySink.create({of: ConfluenceRow}));
-      return Promise.all([
-        foamStore('confluence', confluenceRowSpec, `class:${ConfluenceRow.id}`,
-                  foam.json.Outputter.create({
-                    pretty: true,
-                    formatDatesAsNumbers: true,
-                    outputDefaultValues: false,
-                    useShortNames: false,
-                    strict: false,
-                  })),
-        foamStore('confluence', confluenceRows),
-      ]);
+      latests.confluence.version = dateID;
+      latests.confluence.cls = confluenceRowSpec;
+      return Promise.all(
+          confluenceApis.map(api => confluenceDAO.put(
+              ConfluenceRow.create(null, ctx).fromGridRow(api))))
+          .then(() => latestDAO.put(latests.confluence));
     })(),
+    //
+    // MDN/Compat update
+    //
     (async function() {
-      const mdnData = require('mdn-browser-compat-data');
+      if (!argv.updateMdnData) return Promise.resolve();
 
-      const getBrowserName = mdn.CompatClassGenerator
-            .getAxiomByName('browserNameFromMdnKey').code;
-      const getPropName = mdn.CompatClassGenerator
-            .getAxiomByName('propNameFromMdnKey').code;
-
-      const mdnApis = Object.assign(
-          {}, mdnData.api, mdnData.javascript.builtins);
-
-      let browserInfoPropMap = {};
+      let promises = [];
       for (const iface of Object.keys(mdnApis)) {
         if (iface.indexOf('__') !== -1) continue;
         for (const api of Object.keys(mdnApis[iface])) {
@@ -167,70 +265,47 @@ let issueDAO;
                 mdnApis[iface][api].__compat.support)) {
             continue;
           }
-          const keys = Object.keys(mdnApis[iface][api].__compat.support);
-          for (const key of keys) {
-            if (browserInfoPropMap[key]) continue;
-            const browserName = getBrowserName(key);
-            browserInfoPropMap[key] = {
-              class: 'org.mozilla.mdn.BrowserInfoProperty',
-              name: getPropName(key),
-              label: browserName,
-              browserName: browserName,
-            };
-          }
-        }
-      }
-      let browserInfoProps = [];
-      for (const key of Object.keys(browserInfoPropMap)) {
-        browserInfoProps.push(browserInfoPropMap[key]);
-      }
-      const compatClassGenerator =
-            mdn.CompatClassGenerator.create();
-      const compatRowSpec = compatClassGenerator
-            .generateSpec('org.mozilla.mdn.generated', 'CompatRow', browserInfoProps);
-      const CompatRow = compatClassGenerator.
-            generateClass(compatRowSpec);
-
-      mdnDAO = foam.dao.MDAO.create({of: CompatRow});
-      for (const iface of Object.keys(mdnApis)) {
-        if (iface.indexOf('__') !== -1) continue;
-        for (const api of Object.keys(mdnApis[iface])) {
-          if (/[^a-z]/i.test(api) ||
-              !(mdnApis[iface][api].__compat &&
-                mdnApis[iface][api].__compat.support)) {
-            continue;
-          }
-          mdnDAO.put(CompatRow.create({
+          promises.push(mdnDAO.put(CompatRow.create({
             id: `${iface}#${api}`,
-          }).fromMdnData(mdnApis[iface][api], browserNameMap));
+          }).fromMdnData(mdnApis[iface][api], browserNameMap)));
         }
       }
-      const mdnRows = await mdnDAO.select(
-          foam.dao.ArraySink.create({of: CompatRow}));
-      return Promise.all([
-        foamStore('mdn', compatRowSpec, `class:${CompatRow.id}`,
-                  foam.json.Outputter.create({
-                    pretty: true,
-                    formatDatesAsNumbers: true,
-                    outputDefaultValues: false,
-                    useShortNames: false,
-                    strict: false,
-                  })),
-        foamStore('mdn', mdnRows),
-      ]);
+
+      latests.mdn.version = dateID;
+      latests.mdn.cls = compatRowSpec;
+      return Promise.all(promises)
+          .then(() => latestDAO.put(latests.mdn));
     })(),
   ]);
-})().then(async function() {
+})().then(() => {
+  //
+  // Store latest versions locally.
+  //
+  let latestArray = [];
+  for (const key of Object.keys(latests)) {
+    latestArray.push(latests[key]);
+  }
+  fs.writeFileSync(
+      `${__dirname}/../public/data/latest.json`,
+      foam.json.Outputter.create({
+        pretty: true,
+        formatDatesAsNumbers: true,
+        outputDefaultValues: false,
+        useShortNames: false,
+        strict: true,
+      }).stringify(latestArray, mdn.Version));
+}).then(() => {
+  //
+  // Issues update
+  //
+  if (!argv.updateIssues) return Promise.resolve();
+
   require('../public/lib/org/mozilla/mdn/IssueType.es6.js');
   require('../public/lib/org/mozilla/mdn/IssueStatus.es6.js');
   require('../public/lib/org/mozilla/mdn/Issue.es6.js');
   require('../public/lib/org/mozilla/mdn/VersionIssueGenerator.es6.js');
 
-  issueDAO = await mdn.VersionIssueGenerator.create()
-      .generateIssues(confluenceDAO, mdnDAO, foam.dao.MDAO.create({
-        of: mdn.Issue,
-      }));
-  const issueRows = await issueDAO.select(
-      foam.dao.ArraySink.create({of: mdn.Issue}));
-  return foamStore('issues', issueRows);
+  return mdn.VersionIssueGenerator.create({
+    clobberIssues: argv.clobberIssues,
+  }).generateIssues(confluenceDAO, mdnDAO, issuesDAO);
 }).then(() => logger.info('DONE'));

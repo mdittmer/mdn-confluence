@@ -3,7 +3,7 @@
 WD=$(readlink -f $(dirname "$BASH_SOURCE"))
 cd "${WD}/.."
 
-node node_modules/foam2/tools/build.js web
+node node_modules/foam2/tools/build.js web,firebase
 
 mkdir -p public/third_party/foam2
 cp \

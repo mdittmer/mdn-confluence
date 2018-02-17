@@ -59,6 +59,7 @@
 
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.6.0/firebaseui.css" />
     <style>
       body {
         font-family: 'Roboto', sans-serif;
@@ -71,30 +72,44 @@
         padding: 0;
       }
 
+      #firebaseui-auth-container {
+        display: none;
+	z-index: 10000;
+	background-color: white;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+
       .foam-u2-stack-StackView {
         display: flex;
-	flex-direction: column;
+        flex-direction: column;
       }
 
       .foam-u2-stack-StackView > actions {
-	flex-grow: 0;
-	flex-shrink: 0;
-	display: flex;
-	min-height: 0;
-	background-color: rgb(29, 103, 189);
-	color: rgba(255, 255, 255, 0.8);
-	box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-	z-index: 100;
+        flex-grow: 0;
+        flex-shrink: 0;
+        display: flex;
+        min-height: 0;
+        background-color: rgb(29, 103, 189);
+        color: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        z-index: 100;
       }
 
       /* HACK(markdittmer): Force Stack's forward action to remain hidden */
       .foam-u2-stack-StackView > actions .org-mozilla-mdn-ActionView-forward,
       .foam-u2-stack-StackView > actions .org-mozilla-mdn-ActionView-disabled {
-	display: none;
+        display: none;
       }
     </style>
+
+    <script defer src="auth.es6.js"></script>
+    <script defer src="multi.es6.js"></script>
   </head>
   <body>
-    <script src="multi.es6.js"></script>
+    <div id="firebaseui-auth-container"></div>
   </body>
 </html>

@@ -15,19 +15,15 @@
   foam.register(confluenceRowCls);
   foam.package.registerClass(confluenceRowCls);
 
+
   const ConfluenceRow = confluenceRowCls;
-  let confluenceDAO = foam.dao.PromisedDAO.create({
+  let confluenceDAO = com.google.firebase.AuthenticatedDAO.create({
+    firebase,
     of: ConfluenceRow,
-    promise: fetch('data/confluence/org.mozilla.mdn.generated.ConfluenceRow.json')
-      .then(response => response.json())
-      .then(json => foam.json.parse(json, ConfluenceRow))
-      .then(array => {
-        const dao = foam.dao.MDAO.create({of: ConfluenceRow});
-        for (const row of array) {
-          dao.put(row);
-        }
-        return dao;
-      }),
+    delegate: com.google.firebase.FirestoreDAO.create({
+      firestore: firebase.firestore(),
+      collection: firebase.firestore().collection('confluence_2018-02-14T16:43:25.072Z'),
+    }),
   });
 
   // TODO(markdittmer): Shouldn't these already be in release date order?

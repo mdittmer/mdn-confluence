@@ -117,9 +117,12 @@ foam.CLASS({
               return dao.select(this.ArraySink.create({
                 flowControlId: this.flowControlId,
               }));
-            })).then(this.flowControl(arraySink => {
-              if (!arraySink) return null;
-              return this.setPredicateFromArray(arraySink.array);
+            })).then(this.flowControl(sink => {
+              if (!sink) return null;
+              while (!sink.array) {
+                sink = sink.delegate;
+              }
+              return this.setPredicateFromArray(sink.array);
             }));
       },
     },

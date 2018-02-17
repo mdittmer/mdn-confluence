@@ -30,6 +30,15 @@ foam.CLASS({
     NEVER_VERSION: [Infinity],
   },
 
+  properties: [
+    {
+      class: 'Boolean',
+      name: 'clobberIssues',
+      documentation: `Whether or not issue generation should clobber existing
+          issues.`,
+    },
+  ],
+
   methods: [
     function generateIssues(confluenceDAO, mdnDAO, issueDAO) {
       return (async function() {
@@ -93,7 +102,17 @@ foam.CLASS({
             }
           }
           for (const key of Object.keys(issues)) {
-            if (issues[key]) issueDAO.put(issues[key]);
+            if (issues[key]) {
+              const issue = issues[key];
+              if (this.clobberIssues) {
+                issueDAO.put(issue);
+              } else {
+                const foundIssue = await issueDAO.find(issue.id);
+                if (!foundIssue) {
+                  issueDAO.put(issue);
+                }
+              }
+            }
           }
         }
 
