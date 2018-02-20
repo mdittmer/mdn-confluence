@@ -15,6 +15,7 @@ require('./node_modules/web-api-confluence-dashboard/lib/local_json_dao.es6.js')
 require('./node_modules/web-api-confluence-dashboard/lib/web_apis/release.es6.js');
 global.chr = org.chromium.apis.web;
 
+require('./public/lib/foam/dao/WebSocketDAOProvider.es6.js');
 require('./public/lib/org/mozilla/mdn/property.es6.js');
 require('./public/lib/org/mozilla/mdn/LocalJsonDAO.es6.js');
 require('./public/lib/org/mozilla/mdn/HttpJsonDAO.es6.js');

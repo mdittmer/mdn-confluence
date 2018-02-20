@@ -18,7 +18,11 @@ foam.CLASS({
     'org.chromium.apis.web.SerializableHttpJsonDAO',
     'org.chromium.apis.web.SerializableLocalJsonDAO',
   ],
-  imports: ['gcloudProjectId? as importedProjectId'],
+  imports: [
+    'gcloudProjectId? as importedProjectId',
+    'error',
+    'info',
+  ],
   exports: ['gcloudProjectId'],
 
   properties: [
@@ -84,6 +88,8 @@ foam.CLASS({
       this.SUPER();
       this.validate();
 
+      this.info(`${this.cls_.id} of ${this.of.id} created from ${this.url}`);
+
       const of = this.of;
       const url = this.url_.parse(this.url);
       const serializableDAO = url.protocol === 'file:' ?
@@ -112,11 +118,19 @@ foam.CLASS({
 
       // Perform simple query to ensure DAO is eagerly initialized.
       this.promise = dao.limit(1).select().then(() => dao);
+
+      this.promise.then(
+        dao => this.info(`Promised ${this.cls_.id} of ${this.of.id} from ${this.url} resolved as ${dao.cls_.id}`),
+        err => this.error(`Promised ${this.cls_.id} of ${this.of.id} from ${this.url} rejected with ${err}`)
+      );
     },
     function detach() {
-      if (this.registeredName_)
+      if (this.registeredName_) {
+        this.info(`${this.cls_.id} unregistering service on detach`);
         this.forkRegistry.unregister(this.registeredName_);
+      }
       this.registeredName_ = '';
+      this.info(`${this.cls_.id} killing child process on detach`);
       // TODO(markdittmer): Shouldn't reach into private member: child_.
       this.forkBox.child_.kill();
       return this.SUPER();

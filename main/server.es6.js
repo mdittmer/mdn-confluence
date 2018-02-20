@@ -6,28 +6,18 @@
 require('../boot.es6.js');
 
 (async function() {
-  function getPollingDAO(classId) {
-    return mdn.DataHashUrlPollingDAO.create({
-      classId,
-    });
+  function getPollingDAOWebSocketBox(classId, serviceName) {
+    const serverDAO = mdn.DataHashUrlPollingDAO.create({classId});
+    const box = foam.dao.WebSocketDAOProvider.create({serviceName, serverDAO})
+            .getServerBox();
+    return {dao: serverDAO, box};
   }
+  // TODO(markdittmer): Need helper function for FirebaseDAO case.
 
-  // const confluenceDAO =
-  //       getPollingDAO('org.mozilla.mdn.generated.ConfluenceRow');
-  const compatDAO = getPollingDAO('org.mozilla.mdn.generated.CompatRow');
-
-  // NEXT TODO: PipeSink is not serializable (refers to a local DAO), but it
-  // is blowing up the stack being serialized when pipe() is used below.
-  // Also select() should be working, but it seems like PromiseDAOs are not
-  // waiting until data are aready. (Could be same root cause: Sink below is
-  // not seriailizable either).
-  debugger;
-  compatDAO.pipe(foam.dao.QuickSink.create({
-    putFn: obj => {
-      console.log('CompatRow', obj);
-      debugger;
-    },
-  }));
+  const confluence = getPollingDAOWebSocketBox(
+    'org.mozilla.mdn.generated.ConfluenceRow',
+    'confluence');
 })().catch(err => {
+  console.error('SERVER FAILURE', err);
   debugger;
 });

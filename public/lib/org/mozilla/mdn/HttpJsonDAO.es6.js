@@ -9,6 +9,10 @@ foam.CLASS({
   refines: 'org.chromium.apis.web.HttpJsonDAO',
 
   requires: ['foam.json.Parser'],
+  imports: [
+    'error',
+    'info',
+  ],
 
   properties: [
     {
@@ -17,6 +21,17 @@ foam.CLASS({
         // TODO(markdittmer): Add mdn-confluence whitelist.
         return this.Parser.create({strict: true});
       },
+    },
+  ],
+
+  methods: [
+    function init() {
+      this.SUPER();
+      this.info(`${this.cls_.id} of ${this.of.id} created from ${this.url}`);
+      this.promise.then(
+        dao => this.info(`Promised ${this.cls_.id} of ${this.of.id} from ${this.url} resolved as ${dao.cls_.id}`),
+        err => this.error(`Promised ${this.cls_.id} of ${this.of.id} from ${this.url} rejected with ${err}`)
+      );
     },
   ],
 });

@@ -10,7 +10,10 @@ foam.CLASS({
   implements: ['org.mozilla.mdn.DataHashUrlComponent'],
 
   requires: ['foam.net.HTTPRequest'],
-  imports: ['creationContext'],
+  imports: [
+    'creationContext',
+    'info',
+  ],
 
   properties: [
     {
@@ -41,6 +44,8 @@ foam.CLASS({
       name: 'needsUpdate',
       code: (async function() {
         const newHash = await this.fetchFromUrl(this.hashUrl);
+        this.info(`${this.cls_.id}.needsUpdate(): Comparing hashes
+                      "${this.hash_}" and "${newHash}"`);
         return this.hash_ !== newHash;
       }),
     },
@@ -48,20 +53,20 @@ foam.CLASS({
       name: 'classFactory',
       code: (async function maybeLoad() {
         const specStr = await this.fetchFromUrl(this.classUrl);
+        this.info(`${this.cls_.id}.classFactory(): Constructing class from
+                      ${specStr}`);
         const model = foam.json.parseString(specStr);
         model.validate();
         const cls = model.buildClass();
         cls.validate();
 
         const ctx = this.creationContext.createSubContext({});
-        console.log('Register', cls.id, 'in', ctx.$UID);
         ctx.register(cls);
         foam.package.registerClass(cls);
         this.hash_ = this.hashProvider.getHash(specStr);
 
         this.creationContext = ctx;
 
-        console.log('Provide', cls.id, 'in', ctx.$UID);
         return ctx;
       }),
     },

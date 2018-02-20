@@ -65,6 +65,8 @@ foam.CLASS({
     {
       name: 'clientDAO_',
       factory: function() {
+        // TODO(markdittmer): This will stop working if `this.of` is a generated
+        // class and the server regenerates.
         let dao = this.EasyDAO.create({
           of: this.of,
           daoType: 'CLIENT',

@@ -14,6 +14,10 @@ foam.CLASS({
     'org.mozilla.mdn.DataHashUrlCodeLoader',
     'org.mozilla.mdn.ForkedJsonDAO',
   ],
+  imports: [
+    'error',
+    'info',
+  ],
 
   properties: [
     {
@@ -38,14 +42,19 @@ foam.CLASS({
         });
       },
     },
+    {
+      class: 'String',
+      name: 'nextHash_',
+    },
   ],
 
   methods: [
     {
       name: 'needsUpdate',
       code: (async function() {
-        const newHash = await this.fetchFromUrl(this.hashUrl);
-        return this.hash_ !== newHash;
+        this.nextHash_ = await this.fetchFromUrl(this.hashUrl);
+        this.info(`${this.cls_.id} from ${this.dataUrl} by ${this.hashUrl}: Comparing hashes "${this.hash_}" and "${this.nextHash_}"`);
+        return this.hash_ !== this.nextHash_;
       }),
     },
     {
@@ -55,10 +64,28 @@ foam.CLASS({
         const ctx = await this.codeLoader.maybeLoad();
         const of = ctx.lookup(this.classId);
 
-        // Crete new ForkedJsonDAO (with new fork). PollingDAO will detach() any
-        // old fork, triggering registry.unregister() + child.kill() on old DAO
-        // (if applicable).
-        return this.ForkedJsonDAO.create({of, url: this.dataUrl}, ctx);
+        this.info(`${this.cls_.id} from ${this.dataUrl} by ${this.hashUrl}: Providing new ${this.ForkedJsonDAO.id}`);
+        // Create new ForkedJsonDAO (with new fork). PollingDAO will detach()
+        // any old fork, triggering registry.unregister() + child.kill() on old
+        // DAO (if applicable).
+        const newDelegate = this.ForkedJsonDAO.create({
+          of,
+          url: this.dataUrl,
+        }, ctx);
+
+        // Wait for DAO to start deliving results, then lock in new hash.
+        //
+        // TODO(markdittmer): Could this be racey if multiple delegate update
+        // attempts wind up in flight at the same time?
+        const newHash = this.nextHash_;
+        newDelegate.limit(1).select().then(() => {
+          this.info(`${this.cls_.id} from ${this.dataUrl} by ${this.hashUrl}: New delegate serving results; locking in new hash: ${newHash}`);
+          this.hash_ = newHash;
+        }, err => {
+          this.error(`${this.cls_.id} from ${this.dataUrl} by ${this.hashUrl}: Failed to serve new results; skipping hash update`);
+        });
+
+        return newDelegate;
       }),
     },
   ],
