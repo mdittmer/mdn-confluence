@@ -15,8 +15,8 @@ require('./node_modules/web-api-confluence-dashboard/lib/local_json_dao.es6.js')
 require('./node_modules/web-api-confluence-dashboard/lib/web_apis/release.es6.js');
 global.chr = org.chromium.apis.web;
 
-require('./public/lib/foam/dao/WebSocketDAOProvider.es6.js');
 require('./public/lib/org/mozilla/mdn/property.es6.js');
+require('./public/lib/foam/dao/WebSocketDAOProvider.es6.js');
 require('./public/lib/org/mozilla/mdn/LocalJsonDAO.es6.js');
 require('./public/lib/org/mozilla/mdn/HttpJsonDAO.es6.js');
 require('./public/lib/org/mozilla/mdn/GridProperty.es6.js');
@@ -43,8 +43,5 @@ const credentialsPath = `${__dirname}/.local/credentials.json`;
 if (fs.existsSync(credentialsPath)) {
   ctxConfig.gcloudCredentialsPath = credentialsPath;
 }
-const boxContext = foam.box.Context.create();
-const ctx = boxContext.__subContext__.createSubContext(ctxConfig);
 
-foam.boxContext = boxContext;
-foam.__context__ = ctx;
+require('./public/shared_boot.es6.js')(ctxConfig);

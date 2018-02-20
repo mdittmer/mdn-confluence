@@ -42,7 +42,6 @@ foam.CLASS({
       class: 'Int',
       name: 'port',
       factory: function() {
-        debugger;
         return this.webSocketService.port || 4000;
       },
     },
