@@ -115,7 +115,7 @@ foam.CLASS({
           this.generateDataClass()
               .then(() => this.importClass_(this.dataClassSpec_)),
           this.importData_(arraySink),
-        ]);
+        ]).then(() => arraySink);
       }),
     },
     {

@@ -8,6 +8,7 @@ foam.CLASS({
   name: 'BaseImporter',
 
   requires: [
+    'foam.json.ModelOutputter',
     'foam.json.Outputter',
     'org.chromium.apis.web.Release',
     'org.chromium.apis.web.SerializableHttpJsonDAO',
@@ -24,6 +25,10 @@ foam.CLASS({
       name: 'releaseJsonUrl',
       factory: function() {
         return this.url_.parse(`https://storage.googleapis.com/web-api-confluence-data-cache/latest/json/org.chromium.apis.web.Release.json`);
+      },
+      adapt: function(_, nu) {
+        if ( foam.String.isInstance(nu) ) return this.url_.parse(nu);
+        return nu;
       },
     },
     {

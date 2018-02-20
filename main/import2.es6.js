@@ -3,42 +3,66 @@
 // found in the LICENSE file.
 'use strict';
 
-const fs = require('fs');
+require('../boot.es6.js');
 
-global.FOAM_FLAGS = {firebase: true};
-require('foam2');
+const argv = require('yargs')
+      .help('h')
+      .option('confluence-release-url', {
+        alias: 'cru',
+        desc: `Absolute https: or file: URL to JSON for Confluence release metadata for GridRows`,
+        default: `https://storage.googleapis.com/web-api-confluence-data-cache/latest/json/org.chromium.apis.web.Release.json`,
+        coerce: cru => {
+          if (!/^(https|file):[/][/]/i.test(cru)) {
+            throw new Error('Invalid confluence-release-url: ${cru}');
+          }
+          return cru;
+        },
+      })
+      .option('confluence-data-url', {
+        alias: 'cdu',
+        desc: `Absolute https: or file: URL to JSON for Confluence GridRows`,
+        default: `https://storage.googleapis.com/web-api-confluence-data-cache/latest/json/org.chromium.apis.web.GridRow.json`,
+        coerce: cdu => {
+          if (!/^(https|file):[/][/]/i.test(cdu)) {
+            throw new Error('Invalid confluence-data-url: ${cdu}');
+          }
+          return cdu;
+        },
+      })
+      .option('update-issues', {
+        type: 'boolean',
+        desc: `Update programmatically generated issues from Confluence/MDN inconsistencies`,
+        default: true,
+      })
+      .option('clobber-issues', {
+        type: 'boolean',
+        desc: `Clobber existing issues. WARNING: THIS WILL OVERWRITE EXISTING ISSUE STATE!`,
+        default: false,
+      })
+      .argv;
 
-// TODO(markdittmer): Better expose Confluence modules.
-require('../node_modules/web-api-confluence-dashboard/lib/grid_dao.es6.js');
-require('../node_modules/web-api-confluence-dashboard/lib/http_json_dao.es6.js');
-require('../node_modules/web-api-confluence-dashboard/lib/json_dao_container.es6.js');
-require('../node_modules/web-api-confluence-dashboard/lib/local_json_dao.es6.js');
-require('../node_modules/web-api-confluence-dashboard/lib/web_apis/release.es6.js');
-require('../node_modules/web-api-confluence-dashboard/lib/web_apis/release_interface_relationship.es6.js');
-require('../node_modules/web-api-confluence-dashboard/lib/web_apis/web_interface.es6.js');
-const chr = org.chromium.apis.web;
+(async function() {
+  const confluenceSink =
+        await mdn.ConfluenceImporter.create({
+          releaseJsonUrl: argv.confluenceReleaseUrl,
+          gridRowsJsonUrl: argv.confluenceDataUrl,
+        }).importClassAndData();
+  const compatSink =
+        await mdn.CompatImporter.create().importClassAndData();
 
-require('../public/lib/org/mozilla/mdn/property.es6.js');
-require('../public/lib/org/mozilla/mdn/BaseImporter.es6.js');
-require('../public/lib/org/mozilla/mdn/ConfluenceImporter.es6.js');
-require('../public/lib/org/mozilla/mdn/CompatImporter.es6.js');
-require('../public/lib/org/mozilla/mdn/GridProperty.es6.js');
-require('../public/lib/org/mozilla/mdn/BrowserInfo.es6.js');
-require('../public/lib/org/mozilla/mdn/BrowserInfoProperty.es6.js');
-require('../public/lib/org/mozilla/mdn/CompatClassGenerator.es6.js');
-require('../public/lib/org/mozilla/mdn/ConfluenceClassGenerator.es6.js');
-const mdn = org.mozilla.mdn;
+  if (!argv.updateIssues) return;
 
-let ctxConfig = {gcloudProjectId: 'mdn-confluence'};
-const credentialsPath = `${__dirname}/../.local/credentials.json`;
-if (fs.existsSync(credentialsPath)) {
-  ctxConfig.gcloudCredentialsPath = credentialsPath;
-}
-const ctx = foam.createSubContext(ctxConfig);
-const confluenceImporter = mdn.ConfluenceImporter.create(null, ctx);
-const compatImporter = mdn.CompatImporter.create(null, ctx);
-
-Promise.all([
-  confluenceImporter.importClassAndData(),
-  compatImporter.importClassAndData(),
-]);
+  const initDAO = function(sink) {
+    const dao = foam.dao.MDAO.create({of: sink.of});
+    return Promise.all(sink.array.map(item => dao.put(item))).then(() => dao);
+  };
+  mdn.VersionIssueGenerator.create({
+    clobberIssues: argv.clobberIssues,
+  }).generateIssues(
+      await initDAO(confluenceSink),
+      await initDAO(compatSink),
+      com.google.firebase.FirestoreDAO.create({
+        collectionPath: 'issues',
+        of: mdn.Issue,
+      }));}
+)();

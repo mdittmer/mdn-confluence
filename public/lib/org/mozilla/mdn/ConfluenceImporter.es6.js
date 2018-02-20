@@ -24,6 +24,10 @@ foam.CLASS({
       factory: function() {
         return this.url_.parse(`https://storage.googleapis.com/web-api-confluence-data-cache/latest/json/org.chromium.apis.web.GridRow.json`);
       },
+      adapt: function(_, nu) {
+        if ( foam.String.isInstance(nu) ) return this.url_.parse(nu);
+        return nu;
+      },
     },
   ],
 
@@ -81,7 +85,7 @@ foam.CLASS({
           this.generateDataClass()
               .then(() => this.importClass_(this.dataClassSpec_)),
           this.importData_(confluenceSink),
-        ]);
+        ]).then(() => confluenceSink);
       }),
     },
   ],
