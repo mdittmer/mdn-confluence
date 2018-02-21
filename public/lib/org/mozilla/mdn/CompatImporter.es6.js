@@ -112,8 +112,7 @@ foam.CLASS({
             this.ArraySink.create({of: dao.of}));
 
         return Promise.all([
-          this.generateDataClass()
-              .then(() => this.importClass_(this.dataClassSpec_)),
+          this.generateDataClass().then(this.importClass_.bind(this)),
           this.importData_(arraySink),
         ]).then(() => arraySink);
       }),

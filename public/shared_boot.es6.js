@@ -31,13 +31,13 @@
   const dataCtx = createContext(foam.json.Parser, foam.box.BoxJsonOutputter,
                                   opt_ctxConfig);
   const codeCtx = createContext(foam.json.ModelParser,
-                                      foam.json.ModelOutputter, opt_ctxConfig);
+                                foam.json.ModelOutputter, opt_ctxConfig);
 
   // Default ctx is a strict serialization ctx. Expose the permissive code
   // loader ctx and Model DAO (created in code loader ctx) on the default ctx.
-  foam.__context__ = foam.dataCtx.createSubContext({
+  foam.__context__ = dataCtx.createSubContext({
     codeCtx,
-    modelDAO: foam.dao.MDAO.create({of: foam.core.model}, codeCtx),
+    modelDAO: foam.dao.MDAO.create({of: foam.core.Model}, codeCtx),
     dataParser: dataCtx.parser,
     dataOutputter: dataCtx.outputter,
     codeParser: codeCtx.parser,

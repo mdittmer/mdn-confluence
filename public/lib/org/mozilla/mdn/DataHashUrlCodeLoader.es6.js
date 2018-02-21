@@ -21,13 +21,13 @@ foam.CLASS({
     {
       name: 'classUrl',
       expression: function(gcloudProjectId, classId) {
-        return `https://storage.googleapis.com/${gcloudProjectId}.appspot.com/class:${classId}.txt`;
+        return `https://storage.googleapis.com/${gcloudProjectId}.appspot.com/class:${classId}.fon`;
       },
     },
     {
       name: 'hashUrl',
       expression: function(gcloudProjectId, classId) {
-        return `https://storage.googleapis.com/${gcloudProjectId}.appspot.com/class:${classId}.txt.md5sum`;
+        return `https://storage.googleapis.com/${gcloudProjectId}.appspot.com/class:${classId}.fon.md5sum`;
       },
     },
   ],

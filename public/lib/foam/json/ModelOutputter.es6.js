@@ -6,19 +6,33 @@
 foam.CLASS({
   package: 'foam.json',
   name: 'ModelOutputter',
-  extends: 'foam.json.Outputter',
+  extends: 'foam.box.BoxJsonOutputter',
+
+  requires: [
+    'foam.json.Outputter',
+  ],
+
+  properties: [
+    {
+      name: 'strict',
+      getter: function() { return false; },
+      setter: function() { return false; },
+    },
+    {
+      name: 'alwaysQuoteKeys',
+      getter: function() { return false; },
+      setter: function() { return false; },
+    },
+    {
+      name: 'formatFunctionsAsStrings',
+      getter: function() { return false; },
+      setter: function() { return false; },
+    },
+  ],
 
   methods: [
-    function init() {
-      // TODO(markdittmer): foam.json.Outputter uses postSet to change state to
-      // non-default values; changing the underlying default value with
-      // "value: ..." will not trigger a property change event, and using
-      // "factory: ..." doesn't work either because nothing accesses the value.
-      this.strict = false;
-      this.SUPER();
-    },
     function outputFObject(o, opt_cls) {
-      if ( o.outputJSON && !foam.core.Property.isInstance(o) ) {
+      if (o.outputJSON && !foam.core.Property.isInstance(o)) {
         o.outputJSON(this);
       } else {
         this.outputFObject_(o, opt_cls);
