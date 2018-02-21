@@ -8,10 +8,10 @@ foam.CLASS({
   package: 'org.mozilla.mdn',
   refines: 'org.chromium.apis.web.HttpJsonDAO',
 
-  requires: ['foam.json.Parser'],
   imports: [
     'error',
     'info',
+    'parser as importedParser',
   ],
 
   properties: [
@@ -19,7 +19,7 @@ foam.CLASS({
       name: 'parser',
       factory: function() {
         // TODO(markdittmer): Add mdn-confluence whitelist.
-        return this.Parser.create({strict: true});
+        return this.importedParser;
       },
     },
   ],

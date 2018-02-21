@@ -9,13 +9,13 @@ require('../boot.es6.js');
   // TODO(markdittmer): This could suffer from a race condition wrt parent
   // process's view of code. Really, these models should be delivered from the
   // parent.
-  let nextCtx = foam.__context__;
-  nextCtx = await mdn.DataHashUrlCodeLoader.create({
+  const codeCtx = foam.__context__.codeCtx;
+  await mdn.DataHashUrlCodeLoader.create({
     classId: 'org.mozilla.mdn.generated.ConfluenceRow',
-  }).maybeLoad();
-  nextCtx = await mdn.DataHashUrlCodeLoader.create({
+  }, codeCtx).maybeLoad();
+  await mdn.DataHashUrlCodeLoader.create({
     classId: 'org.mozilla.mdn.generated.CompatRow',
-  }).maybeLoad();
+  }, codeCtx).maybeLoad();
 
   // const boxContext = foam.box.Context.create(null, nextCtx);
   // const ctx = boxContext.__subContext__;
