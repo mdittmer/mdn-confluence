@@ -17,6 +17,7 @@ foam.CLASS({
   imports: [
     'error',
     'info',
+    'codeCtx?',
   ],
 
   properties: [
@@ -39,7 +40,7 @@ foam.CLASS({
       factory: function() {
         return this.DataHashUrlCodeLoader.create({
           classId: this.classId,
-        });
+        }, this.codeCtx || this);
       },
     },
     {

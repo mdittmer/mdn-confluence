@@ -16,8 +16,12 @@ foam.CLASS({
     'org.mozilla.mdn.HashProvider',
   ],
   imports: [
-    'gcloudProjectId',
+    'codeCtx?',
+    'codeOutputter? as importedCodeOutputter',
+    'dataCtx?',
+    'dataOutputter? as importedDataOutputter',
     'gcloudCredentialsPath',
+    'gcloudProjectId',
   ],
 
   properties: [
@@ -35,14 +39,14 @@ foam.CLASS({
       class: 'String',
       name: 'classFonPath',
       factory: function() {
-        return `class:${this.dataClass_.id}.txt`;
+        return `class:${this.dataClass_.id}.fon`;
       },
     },
     {
       class: 'String',
       name: 'classHashPath',
       factory: function() {
-        return `class:${this.dataClass_.id}.txt.md5sum`;
+        return `class:${this.dataClass_.id}.fon.md5sum`;
       },
     },
     {
@@ -60,27 +64,22 @@ foam.CLASS({
       },
     },
     {
-      name: 'classOutputter',
+      name: 'codeOutputter',
       factory: function() {
-        return this.Outputter.create({
-          pretty: false,
-          formatDatesAsNumbers: true,
-          outputDefaultValues: false,
-          useShortNames: false,
-          strict: false,
-        });
+        return this.importedCodeOutputter ||
+            this.ModelOutputter.create(null, this.codeCtx || this);
       },
     },
     {
       name: 'dataOutputter',
       factory: function() {
-        return this.Outputter.create({
+        return this.importedDataOutputter || this.Outputter.create({
           pretty: false,
           formatDatesAsNumbers: true,
           outputDefaultValues: false,
           useShortNames: false,
           strict: true,
-        });
+        }, this.dataCtx || this);
       },
     },
     {
@@ -185,10 +184,10 @@ foam.CLASS({
     },
     {
       name: 'importClass_',
-      code: function(spec) {
-        let specStr = this.classOutputter.stringify(spec);
-        const hashStr = this.getHash_(specStr);
-        return this.writeFile_(this.classFonPath, specStr)
+      code: function(cls) {
+        let modelStr = this.codeOutputter.stringify(cls.model_);
+        const hashStr = this.getHash_(modelStr);
+        return this.writeFile_(this.classFonPath, modelStr)
             .then(() => this.writeFile_(this.classHashPath, hashStr));
       },
     },

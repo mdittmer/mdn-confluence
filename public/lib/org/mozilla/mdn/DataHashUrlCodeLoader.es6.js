@@ -13,6 +13,8 @@ foam.CLASS({
   imports: [
     'creationContext',
     'info',
+    'modelDAO?',
+    'parser',
   ],
 
   properties: [
@@ -55,7 +57,7 @@ foam.CLASS({
         const specStr = await this.fetchFromUrl(this.classUrl);
         this.info(`${this.cls_.id}.classFactory(): Constructing class from
                       ${specStr}`);
-        const model = foam.json.parseString(specStr);
+        const model = this.parser.parseString(specStr);
         model.validate();
         const cls = model.buildClass();
         cls.validate();
@@ -66,6 +68,8 @@ foam.CLASS({
         this.hash_ = this.hashProvider.getHash(specStr);
 
         this.creationContext = ctx;
+
+        this.modelDAO && this.modelDAO.put(model);
 
         return ctx;
       }),
