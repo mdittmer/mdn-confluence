@@ -28,6 +28,9 @@ require('../boot.es6.js');
   const confluence = getPollingDAOWebSocketBox(
       'org.mozilla.mdn.generated.ConfluenceRow',
       'confluence');
+  const compat = getPollingDAOWebSocketBox(
+      'org.mozilla.mdn.generated.CompatRow',
+      'compat');
   const model = getModelDAOWebSocketBox('model');
 })().catch(err => {
   console.error('SERVER FAILURE', err);

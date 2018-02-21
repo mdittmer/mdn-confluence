@@ -102,7 +102,6 @@ foam.CLASS({
               safePathPrefixes: [`/${this.gcloudProjectId}.appspot.com/`],
             });
 
-      const ctx = this.__subContext__;
       const dao = this.ReadOnlyDAO.create({
         of,
         delegate: this.ClientDAO.create({
@@ -113,7 +112,7 @@ foam.CLASS({
               this.SkeletonBox.create({
                 data: serializableDAO,
               })),
-        }, ctx),
+        }),
       });
 
       // Perform simple query to ensure DAO is eagerly initialized.
