@@ -11,8 +11,10 @@ foam.CLASS({
 
   requires: [
     'foam.net.HTTPRequest',
+    'org.chromium.apis.web.SerializableHttpJsonDAO',
+    'org.chromium.apis.web.SerializableLocalJsonDAO',
     'org.mozilla.mdn.DataHashUrlCodeLoader',
-    'org.mozilla.mdn.ForkedJsonDAO',
+    'org.mozilla.mdn.ForkedDAO',
   ],
   imports: [
     'error',
@@ -47,6 +49,10 @@ foam.CLASS({
       class: 'String',
       name: 'nextHash_',
     },
+    {
+      name: 'url_',
+      factory: function() { return require('url'); },
+    },
   ],
 
   methods: [
@@ -65,13 +71,24 @@ foam.CLASS({
         const ctx = await this.codeLoader.maybeLoad();
         const of = ctx.lookup(this.classId);
 
-        this.info(`${this.cls_.id} from ${this.dataUrl} by ${this.hashUrl}: Providing new ${this.ForkedJsonDAO.id}`);
-        // Create new ForkedJsonDAO (with new fork). PollingDAO will detach()
+        this.info(`${this.cls_.id} from ${this.dataUrl} by ${this.hashUrl}: Providing new ${this.ForkedDAO.id}`);
+        // Create new ForkedDAO (with new fork). PollingDAO will detach()
         // any old fork, triggering registry.unregister() + child.kill() on old
         // DAO (if applicable).
-        const newDelegate = this.ForkedJsonDAO.create({
+
+        const url = this.url_.parse(this.dataUrl);
+        const serializableDAO = url.protocol === 'file:' ?
+                this.SerializableLocalJsonDAO.create({
+                  of,
+                  path: url.pathname,
+                }) : this.SerializableHttpJsonDAO.create({
+                  of,
+                  url: this.dataUrl,
+                  safePathPrefixes: [`/${this.gcloudProjectId}.appspot.com/`],
+                });
+        const newDelegate = this.ForkedDAO.create({
           of,
-          url: this.dataUrl,
+          serializableDAO,
         }, ctx);
 
         // Wait for DAO to start deliving results, then lock in new hash.

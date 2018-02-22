@@ -5,13 +5,12 @@
 
 
 (foam.isServer ? global : window).mdnConfluenceBoot = opt_ctxConfig => {
-  const boxContext = foam.box.Context.create();
-  const baseCtx = boxContext.__subContext__;
-
   // TODO(markdittmer): Running createSubContext({}) below breaks registry of
   // generated code. This might be a bug in createSubContext().
-  const dataCtx = opt_ctxConfig ? baseCtx.createSubContext(opt_ctxConfig) :
-          baseCtx;
+  const baseCtx = opt_ctxConfig ?
+          foam.__context__.createSubContext(opt_ctxConfig) : foam.__context__;
+  const boxContext = foam.box.Context.create(null, baseCtx);
+  const dataCtx = boxContext.__subContext__;
 
   boxContext.parser = foam.json.Parser.create({
     creationContext$: boxContext.creationContext$,
@@ -19,6 +18,9 @@
   boxContext.outputter = foam.box.BoxJsonOutputter.create(null, dataCtx)
     .copyFrom(foam.json.Network);
 
+  // Create derived context with model parser/outputters for handling code.
+  // Bind in the same creation context so that setting new creationContext
+  // propagates to data context as well.
   const codeCtx = dataCtx.createSubContext({
     parser: foam.json.ModelParser.create({
       creationContext$: boxContext.creationContext$,

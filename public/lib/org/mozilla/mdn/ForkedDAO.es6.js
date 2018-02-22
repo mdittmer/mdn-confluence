@@ -4,9 +4,11 @@
 'use strict';
 
 foam.CLASS({
-  name: 'ForkedJsonDAO',
+  name: 'ForkedDAO',
   package: 'org.mozilla.mdn',
   extends: 'foam.dao.PromisedDAO',
+
+  documentation: 'ClientDAO wrapper for out-of-process FirebaseDAO strategy.',
 
   requires: [
     'foam.box.BoxRegistry',
@@ -19,23 +21,14 @@ foam.CLASS({
     'org.chromium.apis.web.SerializableLocalJsonDAO',
   ],
   imports: [
-    'gcloudProjectId? as importedProjectId',
     'error',
     'info',
   ],
-  exports: ['gcloudProjectId'],
 
   properties: [
     {
-      class: 'String',
-      name: 'gcloudProjectId',
-      factory: function() {
-        return this.importedProjectId || 'mdn-confluence';
-      },
-    },
-    {
-      class: 'String',
-      name: 'url',
+      class: 'foam.dao.DAOProperty',
+      name: 'serializableDAO',
       required: true,
     },
     {
@@ -77,10 +70,6 @@ foam.CLASS({
       class: 'String',
       name: 'registeredName_',
     },
-    {
-      name: 'url_',
-      factory: function() { return require('url'); },
-    },
   ],
 
   methods: [
@@ -88,30 +77,19 @@ foam.CLASS({
       this.SUPER();
       this.validate();
 
-      this.info(`${this.cls_.id} of ${this.of.id} created from ${this.url}`);
+      this.info(`Forking ${this.cls_.id} of ${this.of.id}`);
 
       const of = this.of;
-      const url = this.url_.parse(this.url);
-      const serializableDAO = url.protocol === 'file:' ?
-            this.SerializableLocalJsonDAO.create({
-              of,
-              path: url.pathname,
-            }) : this.SerializableHttpJsonDAO.create({
-              of,
-              url: this.url,
-              safePathPrefixes: [`/${this.gcloudProjectId}.appspot.com/`],
-            });
-
       const dao = this.ReadOnlyDAO.create({
         of,
         delegate: this.ClientDAO.create({
           of,
           delegate: this.forkRegistry.register(
-              this.registeredName_ = foam.uuid.randomGUID(),
-              null,
-              this.SkeletonBox.create({
-                data: serializableDAO,
-              })),
+            this.registeredName_ = foam.uuid.randomGUID(),
+            null,
+            this.SkeletonBox.create({
+              data: this.serializableDAO,
+            })),
         }),
       });
 
@@ -119,8 +97,8 @@ foam.CLASS({
       this.promise = dao.limit(1).select().then(() => dao);
 
       this.promise.then(
-        dao => this.info(`Promised ${this.cls_.id} of ${this.of.id} from ${this.url} resolved as ${dao.cls_.id}`),
-        err => this.error(`Promised ${this.cls_.id} of ${this.of.id} from ${this.url} rejected with ${err}`)
+        dao => this.info(`Promised ${this.cls_.id} of ${this.of.id} resolved as ${dao.cls_.id}`),
+        err => this.error(`Promised ${this.cls_.id} of ${this.of.id} rejected with ${err}`)
       );
     },
     function detach() {
@@ -146,7 +124,7 @@ foam.CLASS({
       if (this.registeredName_) {
         const fb = this.forkBox;
         // TODO(markdittmer): Shouldn't reach into private member: child_.
-        this.error(`PID=${process.pid} exiting due to ForkedJsonDAO
+        this.error(`PID=${process.pid} exiting due to ForkedDAO
                         exit-before-detached
                         (PID=${fb.child_ ? fb.child_.pid : 'UNKNOWN'})`);
         process.exit(1);

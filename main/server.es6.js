@@ -23,7 +23,21 @@ require('../boot.es6.js');
     }, serverDAO).getServerBox();
     return {dao: serverDAO, box};
   }
-  // TODO(markdittmer): Need helper function for FirebaseDAO case.
+  function getFirestoreDAOWebSocketBox(of, serviceName, collectionPath) {
+    const serverDAO =
+            mdn.ForkedDAO.create({
+              of,
+              serializableDAO: mdn.CachingFirestoreDAO.create({
+                of,
+                collectionPath,
+              }),
+            });
+    const box = foam.dao.WebSocketDAOProvider.create({
+      serviceName,
+      serverDAO,
+    }, serverDAO).getServerBox();
+    return {dao: serverDAO, box};
+  }
 
   const confluence = getPollingDAOWebSocketBox(
       'org.mozilla.mdn.generated.ConfluenceRow',
@@ -31,7 +45,8 @@ require('../boot.es6.js');
   const compat = getPollingDAOWebSocketBox(
       'org.mozilla.mdn.generated.CompatRow',
       'compat');
-  const model = getModelDAOWebSocketBox('model');
+  const models = getModelDAOWebSocketBox('models');
+  const issues = getFirestoreDAOWebSocketBox(mdn.Issue, 'issues', 'issues');
 })().catch(err => {
   console.error('SERVER FAILURE', err);
   debugger;
