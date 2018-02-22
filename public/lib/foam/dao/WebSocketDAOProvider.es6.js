@@ -61,37 +61,30 @@ foam.CLASS({
             }));
       },
     },
-    {
-      name: 'clientDAO_',
-      factory: function() {
-        // TODO(markdittmer): This will stop working if `this.of` is a generated
-        // class and the server regenerates.
-        let dao = this.EasyDAO.create({
-          of: this.of,
-          daoType: 'CLIENT',
-          remoteListenerSupport: true,
-          serviceName: `ws://${this.hostname}:${this.port}/${this.serviceName}`,
-        });
-
-        // TODO(markdittmer): Additional SubBox needed to get server box
-        // management to work correctly. This is a workaround for the TODO at
-        // https://github.com/foam-framework/foam2/blob/933635e22f89ba37dbc36ef8928253a5cd91bf4e/src/foam/dao/EasyDAO.js#L291
-        dao.delegate.delegate = this.SubBox.create({
-          name: this.serviceName,
-          delegate: dao.delegate.delegate,
-        });
-
-        return dao;
-      },
-    },
   ],
 
   methods: [
     function getServerBox() {
       return this.serverBox_;
     },
-    function getClientDAO() {
-      return this.clientDAO_;
+    function createClientDAO(opt_ctx) {
+      const ctx = opt_ctx || this;
+      let dao = this.EasyDAO.create({
+        of: this.of,
+        daoType: 'CLIENT',
+        remoteListenerSupport: true,
+        serviceName: `ws://${this.hostname}:${this.port}/${this.serviceName}`,
+      }, ctx);
+
+      // TODO(markdittmer): Additional SubBox needed to get server box
+      // management to work correctly. This is a workaround for the TODO at
+      // https://github.com/foam-framework/foam2/blob/933635e22f89ba37dbc36ef8928253a5cd91bf4e/src/foam/dao/EasyDAO.js#L291
+      dao.delegate.delegate = this.SubBox.create({
+        name: this.serviceName,
+        delegate: dao.delegate.delegate,
+      }, ctx);
+
+      return dao;
     },
   ],
 });

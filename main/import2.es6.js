@@ -7,6 +7,18 @@ require('../boot.es6.js');
 
 const argv = require('yargs')
       .help('h')
+      .option('data-env', {
+        alias: 'de',
+        desc: `The environment where data should be imported to:One of ${
+          mdn.DataEnv.VALUES.map(value => value.name)
+        }`,
+        coerce: de => {
+          const value =
+                mdn.DataEnv.VALUES.filter(value => value.name === de)[0];
+          if (!value) throw new Error(`Unknown data-env: ${de}`);
+          return value;
+        },
+      })
       .option('confluence-release-url', {
         alias: 'cru',
         desc: `Absolute https: or file: URL to JSON for Confluence release metadata for GridRows`,
@@ -42,6 +54,10 @@ const argv = require('yargs')
       .argv;
 
 (async function() {
+  foam.__context__ = foam.__context__.createSubContext({
+    dataEnv: argv.dataEnv,
+  });
+
   const confluenceSink =
         await mdn.ConfluenceImporter.create({
           releaseJsonUrl: argv.confluenceReleaseUrl,

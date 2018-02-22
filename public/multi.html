@@ -8,6 +8,12 @@
     <script src="third_party/confluence/release.es6.js"></script>
     <script src="third_party/confluence/grid_dao.es6.js"></script>
 
+    <script src="shared_boot.es6.js"></script>
+    <script src="lib/foam/json/ModelParser.es6.js"></script>
+    <script src="lib/foam/json/ModelOutputter.es6.js"></script>
+    <script src="lib/foam/dao/WriteOnlyDAO.es6.js"></script>
+    <script src="lib/foam/dao/ReadWriteSplitDAO.es6.js"></script>
+    <script src="lib/foam/dao/WebSocketDAOProvider.es6.js"></script>
     <script src="lib/org/mozilla/mdn/property.es6.js"></script>
     <script src="lib/org/mozilla/mdn/ActionView.es6.js"></script>
     <script src="lib/org/mozilla/mdn/action.es6.js"></script>
@@ -21,7 +27,7 @@
     <script src="lib/org/mozilla/mdn/IssueStatus.es6.js"></script>
     <script src="lib/org/mozilla/mdn/IssueType.es6.js"></script>
     <script src="lib/org/mozilla/mdn/Issue.es6.js"></script>
-    <script src="lib/org/mozilla/mdn/VersionIssueGenerator.es6.js"></script>
+    <script src="lib/org/mozilla/mdn/ModelDAOMonitor.es6.js"></script>
     <script src="lib/org/mozilla/mdn/parse/ConfluenceQueryInterpreter.es6.js"></script>
     <script src="lib/org/mozilla/mdn/parse/DefaultConfluenceQueryInterpreter.es6.js"></script>
     <script src="lib/org/mozilla/mdn/parse/ReleaseApiConfluenceQueryInterpreter.es6.js"></script>
@@ -106,10 +112,10 @@
       }
     </style>
 
-    <script defer src="auth.es6.js"></script>
+    <!-- <script defer src="auth.es6.js"></script> -->
     <script defer src="multi.es6.js"></script>
   </head>
   <body>
-    <div id="firebaseui-auth-container"></div>
+    <!-- <div id="firebaseui-auth-container"></div> -->
   </body>
 </html>

@@ -20,19 +20,20 @@ foam.CLASS({
     'error',
     'info',
     'codeCtx?',
+    'dataEnv',
   ],
 
   properties: [
     {
       name: 'dataUrl',
-      expression: function(gcloudProjectId, classId) {
-        return `https://storage.googleapis.com/${gcloudProjectId}.appspot.com/${classId}.json`;
+      expression: function(classId, gcloudProjectId) {
+        return this.dataEnv.getDataUrl(classId, gcloudProjectId);
       },
     },
     {
       name: 'hashUrl',
       expression: function(gcloudProjectId, classId) {
-        return `https://storage.googleapis.com/${gcloudProjectId}.appspot.com/${classId}.json.md5sum`;
+        return this.dataEnv.getDataHashUrl(classId, gcloudProjectId);
       },
     },
     {

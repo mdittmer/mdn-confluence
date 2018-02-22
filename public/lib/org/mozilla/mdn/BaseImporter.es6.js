@@ -19,6 +19,7 @@ foam.CLASS({
     'codeCtx?',
     'codeOutputter? as importedCodeOutputter',
     'dataCtx?',
+    'dataEnv',
     'dataOutputter? as importedDataOutputter',
     'gcloudCredentialsPath',
     'gcloudProjectId',
@@ -28,7 +29,8 @@ foam.CLASS({
     {
       name: 'releaseJsonUrl',
       factory: function() {
-        return this.url_.parse(`https://storage.googleapis.com/web-api-confluence-data-cache/latest/json/org.chromium.apis.web.Release.json`);
+        return this.url_.parse(
+            this.dataEnv.getConfluenceReleaseUrl(this.gcloudProjectId));
       },
       adapt: function(_, nu) {
         if ( foam.String.isInstance(nu) ) return this.url_.parse(nu);

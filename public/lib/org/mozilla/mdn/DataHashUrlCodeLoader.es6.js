@@ -12,6 +12,7 @@ foam.CLASS({
   requires: ['foam.net.HTTPRequest'],
   imports: [
     'creationContext',
+    'dataEnv',
     'info',
     'modelDAO?',
     'parser',
@@ -20,14 +21,14 @@ foam.CLASS({
   properties: [
     {
       name: 'classUrl',
-      expression: function(gcloudProjectId, classId) {
-        return `https://storage.googleapis.com/${gcloudProjectId}.appspot.com/class:${classId}.fon`;
+      expression: function(classId, gcloudProjectId) {
+        return this.dataEnv.getModelUrl(classId, gcloudProjectId);
       },
     },
     {
       name: 'hashUrl',
       expression: function(gcloudProjectId, classId) {
-        return `https://storage.googleapis.com/${gcloudProjectId}.appspot.com/class:${classId}.fon.md5sum`;
+        return this.dataEnv.getModelHashUrl(classId, gcloudProjectId);
       },
     },
   ],

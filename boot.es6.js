@@ -20,6 +20,7 @@ require('./public/lib/org/mozilla/mdn/property.es6.js');
 require('./public/lib/foam/json/ModelOutputter.es6.js');
 require('./public/lib/foam/json/ModelParser.es6.js');
 require('./public/lib/foam/dao/WebSocketDAOProvider.es6.js');
+require('./public/lib/org/mozilla/mdn/DataEnv.es6.js');
 require('./public/lib/org/mozilla/mdn/LocalJsonDAO.es6.js');
 require('./public/lib/org/mozilla/mdn/HttpJsonDAO.es6.js');
 require('./public/lib/org/mozilla/mdn/GridProperty.es6.js');
@@ -42,9 +43,13 @@ require('./public/lib/org/mozilla/mdn/DataHashUrlCodeLoader.es6.js');
 require('./public/lib/org/mozilla/mdn/BaseImporter.es6.js');
 require('./public/lib/org/mozilla/mdn/ConfluenceImporter.es6.js');
 require('./public/lib/org/mozilla/mdn/CompatImporter.es6.js');
+require('./public/lib/org/mozilla/mdn/WebSocketServer.es6.js');
 global.mdn = org.mozilla.mdn;
 
+const dataEnvStr = process.env.DATA_ENV || 'UNDEFINED';
+const dataEnv = mdn.DataEnv[dataEnvStr] || mdn.DataEnv.DEV;
 let ctxConfig = {
+  dataEnv,
   gcloudProjectId: process.env.GCLOUD_PROJECT || 'mdn-confluence',
 };
 const credentialsPath = `${__dirname}/.local/credentials.json`;
