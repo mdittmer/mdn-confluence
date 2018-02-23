@@ -27,12 +27,14 @@ foam.CLASS({
     {
       name: 'dataUrl',
       expression: function(classId, gcloudProjectId) {
+        console.log('DATA URL:', this.dataEnv.getDataUrl(classId, gcloudProjectId));
         return this.dataEnv.getDataUrl(classId, gcloudProjectId);
       },
     },
     {
       name: 'hashUrl',
       expression: function(gcloudProjectId, classId) {
+        console.log('HASH URL:', this.dataEnv.getDataHashUrl(classId, gcloudProjectId));
         return this.dataEnv.getDataHashUrl(classId, gcloudProjectId);
       },
     },

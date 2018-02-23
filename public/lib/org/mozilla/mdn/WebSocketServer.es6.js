@@ -55,6 +55,10 @@ foam.CLASS({
       // of: 'BoxDAOPair',
       name: 'issues',
     },
+    {
+      name: 'url_',
+      factory: function() { return require('url'); },
+    },
   ],
 
   methods: [
@@ -63,15 +67,17 @@ foam.CLASS({
                                           'confluence');
       this.compat = this.setupPolling_('org.mozilla.mdn.generated.CompatRow',
                                        'compat');
-      this.issues = this.setupFirestore_(this.Issue, 'issues', 'issues');
+
+      if (this.dataEnv.backendIsRemote) {
+        this.issues = this.setupFirestore_(this.Issue, 'issues', 'issues');
+      } else {
+        this.issues = this.setupPolling_('org.mozilla.mdn.Issue',
+                                         'issues');
+      }
     },
     function setupPolling_(classId, serviceName) {
       const serverDAO = this.DataHashUrlPollingDAO.create({classId});
-      const box = this.WebSocketDAOProvider.create({
-        serviceName,
-        serverDAO,
-      }, serverDAO).getServerBox();
-      return this.BoxDAOPair.create({dao: serverDAO, box});
+      return this.getBoxDAOPair_(serviceName, serverDAO);
     },
     function setupFirestore_(of, serviceName, collectionPath) {
       const serverDAO = this.ForkedDAO.create({
@@ -81,6 +87,9 @@ foam.CLASS({
           collectionPath,
         }),
       });
+      return this.getBoxDAOPair_(serviceName, serverDAO);
+    },
+    function getBoxDAOPair_(serviceName, serverDAO) {
       const box = this.WebSocketDAOProvider.create({
         serviceName,
         serverDAO,

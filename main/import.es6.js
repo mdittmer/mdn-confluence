@@ -3,6 +3,8 @@
 // found in the LICENSE file.
 'use strict';
 
+const process = require('process');
+
 const argv = require('yargs')
       .help('h')
       .option('data-env', {
@@ -44,7 +46,7 @@ const argv = require('yargs')
       })
       .argv;
 
-require('process').env.DATA_ENV = argv.dataEnv;
+process.env.DATA_ENV = argv.dataEnv;
 require('../boot.es6.js');
 mdn.InfraServerContextProvider.create().install();
 
@@ -63,13 +65,11 @@ mdn.InfraServerContextProvider.create().install();
     const dao = foam.dao.MDAO.create({of: sink.of});
     return Promise.all(sink.array.map(item => dao.put(item))).then(() => dao);
   };
-  mdn.VersionIssueGenerator.create({
-    clobberIssues: argv.clobberIssues,
-  }).generateIssues(
-      await initDAO(confluenceSink),
-      await initDAO(compatSink),
-      com.google.firebase.FirestoreDAO.create({
-        collectionPath: 'issues',
-        of: mdn.Issue,
-      }));}
+  const confluenceDAO = await initDAO(confluenceSink);
+  const compatDAO = await initDAO(compatSink);
+  await mdn.IssuesImporter.create({
+    confluenceDAO,
+    compatDAO,
+  }).importClassAndData();
+}
 )();

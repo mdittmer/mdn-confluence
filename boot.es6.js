@@ -17,6 +17,7 @@ require('./node_modules/web-api-confluence-dashboard/lib/web_apis/release.es6.js
 global.chr = org.chromium.apis.web;
 
 require('./public/lib/org/mozilla/mdn/property.es6.js');
+require('./public/lib/org/mozilla/mdn/views.es6.js');
 require('./public/lib/foam/json/ModelOutputter.es6.js');
 require('./public/lib/foam/json/ModelParser.es6.js');
 require('./public/lib/foam/dao/WebSocketDAOProvider.es6.js');
@@ -43,6 +44,7 @@ require('./public/lib/org/mozilla/mdn/DataHashUrlCodeLoader.es6.js');
 require('./public/lib/org/mozilla/mdn/BaseImporter.es6.js');
 require('./public/lib/org/mozilla/mdn/ConfluenceImporter.es6.js');
 require('./public/lib/org/mozilla/mdn/CompatImporter.es6.js');
+require('./public/lib/org/mozilla/mdn/IssuesImporter.es6.js');
 require('./public/lib/org/mozilla/mdn/WebSocketServer.es6.js');
 require('./public/lib/org/mozilla/mdn/ContextProvider.es6.js');
 require('./public/lib/org/mozilla/mdn/ServerContextProvider.es6.js');

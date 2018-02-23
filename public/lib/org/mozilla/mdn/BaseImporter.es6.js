@@ -38,34 +38,6 @@ foam.CLASS({
       },
     },
     {
-      class: 'String',
-      name: 'classFonPath',
-      factory: function() {
-        return `class:${this.dataClass_.id}.fon`;
-      },
-    },
-    {
-      class: 'String',
-      name: 'classHashPath',
-      factory: function() {
-        return `class:${this.dataClass_.id}.fon.md5sum`;
-      },
-    },
-    {
-      class: 'String',
-      name: 'dataJsonPath',
-      factory: function() {
-        return `${this.dataClass_.id}.json`;
-      },
-    },
-    {
-      class: 'String',
-      name: 'dataHashPath',
-      factory: function() {
-        return `${this.dataClass_.id}.json.md5sum`;
-      },
-    },
-    {
       name: 'codeOutputter',
       factory: function() {
         return this.importedCodeOutputter ||
@@ -131,6 +103,10 @@ foam.CLASS({
       value: null,
     },
     {
+      name: 'fs_',
+      factory: function() { return require('fs'); },
+    },
+    {
       name: 'url_',
       factory: function() { return require('url'); },
     },
@@ -187,20 +163,26 @@ foam.CLASS({
     {
       name: 'importClass_',
       code: function(cls) {
-        let modelStr = this.codeOutputter.stringify(cls.model_);
+        const modelStr = this.codeOutputter.stringify(cls.model_);
         const hashStr = this.getHash_(modelStr);
-        return this.writeFile_(this.classFonPath, modelStr)
-            .then(() => this.writeFile_(this.classHashPath, hashStr));
+        const modelUrl = this.dataEnv.getModelUrl(cls.id, this.gcloudProjectId);
+        const modelHashUrl = this.dataEnv.getModelHashUrl(
+            cls.id, this.gcloudProjectId);
+        return this.writeFile_(modelUrl, modelStr)
+            .then(() => this.writeFile_(modelHashUrl, hashStr));
       },
     },
     {
       name: 'importData_',
       code: function(arraySink) {
-        const data = this.dataOutputter.stringify(
-            arraySink.array, arraySink.of);
+        const cls = arraySink.of;
+        const data = this.dataOutputter.stringify(arraySink.array, cls);
         const hash = this.getHash_(data);
-        return this.writeFile_(this.dataJsonPath, data)
-            .then(() => this.writeFile_(this.dataHashPath, hash));
+        const dataUrl = this.dataEnv.getDataUrl(cls.id, this.gcloudProjectId);
+        const dataHashUrl = this.dataEnv.getDataHashUrl(
+            cls.id, this.gcloudProjectId);
+        return this.writeFile_(dataUrl, data)
+            .then(() => this.writeFile_(dataHashUrl, hash));
       },
     },
     {
@@ -218,13 +200,25 @@ foam.CLASS({
     },
     {
       name: 'writeFile_',
-      code: function(path, data) {
-        return this.storageBucketPromise_
-            .then(bucket => bucket.file(path).save(data, {
-              metadata: {
-                contentType: this.getContentType_(path),
-              },
-            }));
+      code: function(urlStr, data) {
+        const url = this.url_.parse(urlStr);
+        if (url.protocol === 'file:') {
+          const path = url.pathname;
+          return new Promise(
+              (resolve, reject) => this.fs_.writeFile(path, data,
+                                                      err => err ?
+                                                      reject(err) :
+                                                      resolve()));
+        } else {
+          const prefix = this.dataEnv.getBaseUrl(this.gcloudProjectId) +'/';
+          const path = url.substr(prefix.length);
+          return this.storageBucketPromise_
+              .then(bucket => bucket.file(path).save(data, {
+                metadata: {
+                  contentType: this.getContentType_(path),
+                },
+              }));
+        }
       },
     },
     {

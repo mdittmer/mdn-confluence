@@ -76,7 +76,7 @@ foam.CLASS({
 
         this.modelDAO && this.modelDAO.put(model);
 
-        return ctx;
+        return newCreationContext;
       }),
     },
   ],

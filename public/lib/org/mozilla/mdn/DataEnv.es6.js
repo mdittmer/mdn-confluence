@@ -76,8 +76,20 @@ foam.ENUM({
       },
     },
     {
+      class: 'Boolean',
+      name: 'backendIsRemote',
+      factory: function() {
+      const DataEnv = this.cls_;
+      return this === DataEnv.STAGE || this === DataEnv.PROD;
+      },
+    },
+    {
       name: 'path_',
       factory: function() { return require('path'); },
+    },
+    {
+      name: 'url_',
+      factory: function() { return require('url'); },
     },
   ],
 
@@ -104,7 +116,7 @@ foam.ENUM({
       getBaseUrl: function(opt_gcloudProjectId) {
         return foam.isServer ?
             'file://' + this.path_.resolve(
-                `${__dirname}/../../../../../public/data`) :
+                `${__dirname}/../../../../../data`) :
             `${this.window.location.origin}/data`;
       },
     },
