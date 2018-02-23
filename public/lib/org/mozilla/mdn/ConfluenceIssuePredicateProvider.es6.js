@@ -8,19 +8,20 @@ foam.CLASS({
   name: 'ConfluenceIssuePredicateProvider',
   extends: 'org.mozilla.mdn.BaseForeignPredicateProvider',
 
-  requires: [
-    'org.mozilla.mdn.Issue',
-    'org.mozilla.mdn.generated.ConfluenceRow',
-  ],
+  imports: ['creationContext'],
 
   properties: [
     {
       name: 'from',
-      factory: function() { return this.ConfluenceRow; },
+      factory: function() {
+        return this.creationContext.lookup('org.mozilla.mdn.generated.ConfluenceRow');
+      },
     },
     {
       name: 'to',
-      factory: function() { return this.Issue; },
+      factory: function() {
+        return this.creationContext.lookup('org.mozilla.mdn.Issue');
+      },
     },
     {
       name: 'setPredicateFromArray',

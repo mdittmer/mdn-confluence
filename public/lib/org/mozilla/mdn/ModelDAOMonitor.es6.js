@@ -41,7 +41,7 @@ foam.CLASS({
     function init() {
       this.SUPER();
 
-      this.modelDAO$proxy.listen(this.QuickSink.create({
+      this.modelDAO$proxy.pipe(this.QuickSink.create({
         putFn: this.onModelPut,
       }));
     },
@@ -51,13 +51,20 @@ foam.CLASS({
     function onModelPut(model) {
       if (model.id !== this.classId) return;
 
+      const oldCreationContext = this.creationContext;
       model.validate();
       const cls = model.buildClass();
       cls.validate();
-      const ctx = this.creationContext.createSubContext({});
-      ctx.register(cls);
+      const newCreationContext = oldCreationContext.createSubContext({});
+      newCreationContext.register(cls);
       foam.package.registerClass(cls);
-      this.dao = this.daoFactory({of: cls}, ctx);
+
+      // Swap out creation context and prevent creation from old context.
+      let oldCls = oldCreationContext.lookup(this.classId, true);
+      if (oldCls) oldCls.create = undefined;
+      this.creationContext = newCreationContext;
+
+      this.dao = this.daoFactory({of: cls}, newCreationContext);
     },
   ],
 });

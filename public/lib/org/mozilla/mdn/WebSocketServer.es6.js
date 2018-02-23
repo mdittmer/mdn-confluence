@@ -18,7 +18,6 @@ foam.CLASS({
   ],
   imports: [
     'dataEnv',
-    'modelDAO',
     'warn',
   ],
 
@@ -60,20 +59,11 @@ foam.CLASS({
 
   methods: [
     function start() {
-      // this.setupModelDAO_('models');
       this.confuence = this.setupPolling_('org.mozilla.mdn.generated.ConfluenceRow',
                                           'confluence');
-      // this.compat = this.setupPolling_('org.mozilla.mdn.generated.CompatRow',
-      //                                  'compat');
-      // this.issues = this.setupFirestore_(this.Issue, 'issues', 'issues');
-    },
-    function setupModelDAO_(serviceName) {
-      const serverDAO = this.modelDAO;
-      const box = this.WebSocketDAOProvider.create({
-        serviceName,
-        serverDAO,
-      }, serverDAO).getServerBox();
-      return this.BoxDAOPair.create({dao: serverDAO, box});
+      this.compat = this.setupPolling_('org.mozilla.mdn.generated.CompatRow',
+                                       'compat');
+      this.issues = this.setupFirestore_(this.Issue, 'issues', 'issues');
     },
     function setupPolling_(classId, serviceName) {
       const serverDAO = this.DataHashUrlPollingDAO.create({classId});

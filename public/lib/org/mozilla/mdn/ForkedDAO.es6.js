@@ -112,7 +112,7 @@ foam.CLASS({
       this.forkBox.child_.kill();
       return this.SUPER();
     },
-    function getForkNodeParams_() { return ['--max_old_space_size=4096', '--inspect-brk']; },
+    function getForkNodeParams_() { return ['--max_old_space_size=4096']; },
     function getForkScriptPath_() {
       return require('path')
           .resolve(`${__dirname}/../../../../../main/forkScript.es6.js`);

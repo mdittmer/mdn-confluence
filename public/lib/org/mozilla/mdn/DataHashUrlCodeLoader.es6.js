@@ -63,12 +63,16 @@ foam.CLASS({
         const cls = model.buildClass();
         cls.validate();
 
-        const ctx = this.creationContext.createSubContext({});
-        ctx.register(cls);
+        const oldCreationContext = this.creationContext;
+        const newCreationContext = oldCreationContext.createSubContext({});
+        newCreationContext.register(cls);
         foam.package.registerClass(cls);
         this.hash_ = this.hashProvider.getHash(specStr);
 
-        this.creationContext = ctx;
+        // Swap out creation context and prevent creation from old context.
+        let oldCls = oldCreationContext.lookup(cls.id, true);
+        if (oldCls) oldCls.create = undefined;
+        this.creationContext = newCreationContext;
 
         this.modelDAO && this.modelDAO.put(model);
 

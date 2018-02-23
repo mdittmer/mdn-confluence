@@ -11,6 +11,11 @@ foam.CLASS({
   documentation: `A DAO that sends read and write operations to different
       delegates.`,
 
+  requires: [
+    'foam.dao.ReadOnlyDAO',
+    'foam.dao.WriteOnlyDAO',
+  ],
+
   properties: [
     {
       class: 'foam.dao.DAOProperty',

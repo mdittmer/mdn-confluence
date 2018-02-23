@@ -44,17 +44,8 @@ require('./public/lib/org/mozilla/mdn/BaseImporter.es6.js');
 require('./public/lib/org/mozilla/mdn/ConfluenceImporter.es6.js');
 require('./public/lib/org/mozilla/mdn/CompatImporter.es6.js');
 require('./public/lib/org/mozilla/mdn/WebSocketServer.es6.js');
+require('./public/lib/org/mozilla/mdn/ContextProvider.es6.js');
+require('./public/lib/org/mozilla/mdn/ServerContextProvider.es6.js');
+require('./public/lib/org/mozilla/mdn/WebServerContextProvider.es6.js');
+require('./public/lib/org/mozilla/mdn/InfraServerContextProvider.es6.js');
 global.mdn = org.mozilla.mdn;
-
-const dataEnvStr = process.env.DATA_ENV || 'UNDEFINED';
-const dataEnv = mdn.DataEnv[dataEnvStr] || mdn.DataEnv.DEV;
-let ctxConfig = {
-  dataEnv,
-  gcloudProjectId: process.env.GCLOUD_PROJECT || 'mdn-confluence',
-};
-const credentialsPath = `${__dirname}/.local/credentials.json`;
-if (fs.existsSync(credentialsPath)) {
-  ctxConfig.gcloudCredentialsPath = credentialsPath;
-}
-
-require('./public/shared_boot.es6.js')(ctxConfig);

@@ -79,14 +79,10 @@ foam.CLASS({
     {
       class: 'Class',
       name: 'from',
-      required: true,
-      final: true,
     },
     {
       class: 'Class',
       name: 'to',
-      required: true,
-      final: true,
     },
     {
       class: 'Int',

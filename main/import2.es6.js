@@ -3,21 +3,12 @@
 // found in the LICENSE file.
 'use strict';
 
-require('../boot.es6.js');
-
 const argv = require('yargs')
       .help('h')
       .option('data-env', {
         alias: 'de',
-        desc: `The environment where data should be imported to:One of ${
-          mdn.DataEnv.VALUES.map(value => value.name)
-        }`,
-        coerce: de => {
-          const value =
-                mdn.DataEnv.VALUES.filter(value => value.name === de)[0];
-          if (!value) throw new Error(`Unknown data-env: ${de}`);
-          return value;
-        },
+        desc: `The environment where data should be imported to. See org.mozilla.mdn.DataEnv for details`,
+        default: 'DEV',
       })
       .option('confluence-release-url', {
         alias: 'cru',
@@ -53,11 +44,11 @@ const argv = require('yargs')
       })
       .argv;
 
-(async function() {
-  foam.__context__ = foam.__context__.createSubContext({
-    dataEnv: argv.dataEnv,
-  });
+require('process').env.DATA_ENV = argv.dataEnv;
+require('../boot.es6.js');
+mdn.InfraServerContextProvider.create().install();
 
+(async function() {
   const confluenceSink =
         await mdn.ConfluenceImporter.create({
           releaseJsonUrl: argv.confluenceReleaseUrl,

@@ -3,8 +3,6 @@
 // found in the LICENSE file.
 'use strict';
 
-const process = require('process');
-
 const argv = require('yargs')
       .help('h')
       .option('data-env', {
@@ -15,7 +13,8 @@ const argv = require('yargs')
       .argv;
 
 // Set environment variable for child process configuration.
-process.env.DATA_ENV = process.env.DATA_ENV || argv.dataEnv;
+require('process').env.DATA_ENV = argv.dataEnv;
 require('../boot.es6.js');
+mdn.WebServerContextProvider.create().install();
 
 mdn.WebSocketServer.create().start();
