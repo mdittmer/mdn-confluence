@@ -113,13 +113,14 @@
       serviceName: 'issues',
       port: mdn.ContextProvider.WEB_SOCKET_DATA_PORT,
     }).createClientDAO(),
-    writer: com.google.firebase.AuthenticatedDAO.create({
+    writer: com.google.firebase.AwaitAuthenticationDAO.create({
       delegate: com.google.firebase.FirestoreDAO.create({
         collectionPath: 'issues',
       }),
     }),
   });
   const issueCtx = foam.createSubContext({
+    selectionEnabled: true,
     queryParserFactory: x => mdn.parse.IssueQueryParser.create({
       of: mdn.Issue,
       interpreter: mdn.parse.SimpleIssueQueryInterpreter
