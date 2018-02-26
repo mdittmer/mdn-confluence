@@ -1,5 +1,9 @@
 {
   "name": "mdn-confluence",
+  "config": {
+    "releaseURL":"https://storage.googleapis.com/web-api-confluence-data-cache/archive/2018-01-22/00/json/org.chromium.apis.web.Release.json",
+    "dataURL":"https://storage.googleapis.com/web-api-confluence-data-cache/archive/2018-01-22/00/json/org.chromium.apis.web.GridRow.json"
+  },
   "version": "0.0.1",
   "description": "User support tool for maintaining MDN compatability data using Web API Confluence data.",
   "scripts": {

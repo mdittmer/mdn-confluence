@@ -8,6 +8,7 @@ const path = require('path');
 const process = require('process');
 const url = require('url');
 
+const appMeta = require('../package.json');
 require('foam2');
 
 // TODO(markdittmer): Better expose Confluence modules.
@@ -39,9 +40,21 @@ const USAGE = `USAGE:
                                Confluence release metadata for GridRows.
         ConfluenceDataURL = absolute https: or file: URL to JSON for Confluence
                             GridRows.`;
-if (process.argv.length !== 4) {
-  console.error(USAGE);
-  process.exit(1);
+
+if (process.argv[2] == 'help') {
+  console.log(USAGE);
+  process.exit();
+}
+switch (process.argv.length) {
+  case 2:
+    process.argv[2] = appMeta.config.releaseURL;
+    // Break deliberately left out.
+  case 3:
+    process.argv[3] = appMeta.config.dataURL;
+    break;
+  case 4:
+    console.error(USAGE);
+    process.exit(1)
 }
 
 const releaseUrl = url.parse(process.argv[2]);
