@@ -21,10 +21,11 @@ foam.CLASS({
     },
     {
       name: 'mdnApis_',
-      factory: function() {
-        return Object.assign(
-            {}, this.mdnData_.api, this.mdnData_.javascript.builtins);
-      },
+      factory: function() { return this.mdnData_.api; },
+    },
+    {
+      name: 'mdnBuiltins_',
+      factory: function() { return this.mdnData_.javascript.builtins; },
     },
     {
       name: 'browserNameMap_',
@@ -44,16 +45,18 @@ foam.CLASS({
               .getAxiomByName('propNameFromMdnKey').code;
 
         let browserInfoPropMap = {};
-        for (const iface of Object.keys(this.mdnApis_)) {
+        const ifaces = Object.assign(
+            {}, this.mdnApis_, this.mdnBuiltins_);
+        for (const iface of Object.keys(ifaces)) {
           if (iface.indexOf('__') !== -1) continue;
-          for (const api of Object.keys(this.mdnApis_[iface])) {
+          for (const api of Object.keys(ifaces[iface])) {
             if (/[^a-z]/i.test(api) ||
-                !(this.mdnApis_[iface][api].__compat &&
-                  this.mdnApis_[iface][api].__compat.support)) {
+                !(ifaces[iface][api].__compat &&
+                  ifaces[iface][api].__compat.support)) {
               continue;
             }
             const keys = Object.keys(
-                this.mdnApis_[iface][api].__compat.support);
+                ifaces[iface][api].__compat.support);
             for (const key of keys) {
               if (browserInfoPropMap[key]) continue;
               const browserName = getBrowserName(key);
@@ -93,19 +96,25 @@ foam.CLASS({
         const Cls = await this.generateDataClass();
         const dao = await this.getDAO();
         let promises = [];
-        for (const iface of Object.keys(this.mdnApis_)) {
-          if (iface.indexOf('__') !== -1) continue;
-          for (const api of Object.keys(this.mdnApis_[iface])) {
-            if (/[^a-z]/i.test(api) ||
-                !(this.mdnApis_[iface][api].__compat &&
-                  this.mdnApis_[iface][api].__compat.support)) {
-              continue;
+        const loadApis = (compatDir, ifaces) => {
+          for (const interfaceName of Object.keys(ifaces)) {
+            if (interfaceName.indexOf('__') !== -1) continue;
+            for (const apiName of Object.keys(ifaces[interfaceName])) {
+              if (/[^a-z]/i.test(apiName) ||
+                  !(ifaces[interfaceName][apiName].__compat &&
+                    ifaces[interfaceName][apiName].__compat.support)) {
+                continue;
+              }
+              promises.push(dao.put(Cls.create({
+                compatDir,
+                interfaceName,
+                apiName,
+              }).fromMdnData(ifaces[interfaceName][apiName])));
             }
-            promises.push(dao.put(Cls.create({
-              id: `${iface}#${api}`,
-            }).fromMdnData(this.mdnApis_[iface][api], browserNameMap)));
           }
-        }
+        };
+        loadApis('api', this.mdnApis_);
+        loadApis('javascript/builtins', this.mdnBuiltins_);
         await Promise.all(promises);
 
         const arraySink = await dao.orderBy(dao.of.ID).select(

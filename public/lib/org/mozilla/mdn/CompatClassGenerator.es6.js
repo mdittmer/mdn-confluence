@@ -19,7 +19,10 @@ foam.CLASS({
         package: pkg,
         name: name,
 
-        requires: ['org.mozilla.mdn.BrowserInfo'],
+        requires: [
+          'org.mozilla.mdn.BrowserInfo',
+          'org.mozilla.mdn.CompatDetailView',
+        ],
         imports: ['warn'],
 
         tableColumns: ['id'].concat(browserInfoProps.map(p => p.name)),
@@ -29,7 +32,10 @@ foam.CLASS({
             class: 'String',
             name: 'id',
             label: 'API',
-            required: true,
+            expression: function(interfaceName, apiName) {
+              return `${interfaceName}#${apiName}`;
+            },
+            hidden: true,
             rawTableCellFormatter: function(value, obj, axiom) {
               const textValue = value === undefined ? '&nbsp;' : value;
               return `
@@ -39,6 +45,22 @@ foam.CLASS({
 </div>
 `;
             },
+          },
+          {
+            class: 'String',
+            name: 'interfaceName',
+            required: true,
+          },
+          {
+            class: 'String',
+            name: 'apiName',
+            required: true,
+          },
+          {
+            class: 'String',
+            name: 'compatDir',
+            required: true,
+            hidden: true,
           },
         ].concat(browserInfoProps),
 
@@ -88,6 +110,12 @@ foam.CLASS({
           {
             name: 'propNameFromMdnKey',
             code: this.propNameFromMdnKey,
+          },
+          {
+            name: 'toE',
+            code: function(ctx) {
+              return this.CompatDetailView.create({compatRow: this}, ctx);
+            },
           },
         ],
       };

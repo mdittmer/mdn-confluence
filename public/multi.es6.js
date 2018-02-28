@@ -95,6 +95,7 @@
 
     mdnCtx = foam.createSubContext({
       selected,
+      selectionEnabled: true,
       queryParserFactory: x => mdn.parse.CompatQueryParser.create({
         of: CompatRow,
         interpreter: mdn.parse.BrowserInfoCompatQueryInterpreter
@@ -142,6 +143,7 @@
         mdn.DAOController.create({
           label: 'MDN Compat',
           data: mdnDAO,
+          stack: foam.u2.stack.Stack.create(),
         }, mdnCtx),
         mdn.DAOController.create({
           label: 'Confluence/MDN Issues',
