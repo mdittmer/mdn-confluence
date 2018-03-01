@@ -106,7 +106,8 @@ foam.CLASS({
                 // (2) Stack not yet initialized.
                 const head = ctrl.stack.at(0);
                 if (head) {
-                  foam.assert(head.class === 'org.mozilla.mdn.DAOControllerView',
+                  // "head" is pair-in-array: [<view spec>, <parent view>].
+                  foam.assert(head[0].class === 'org.mozilla.mdn.DAOControllerView',
                               `Unexpected stack head in ${this.cls_.id}`);
                   ctrl.stack.pos = 0;
                 } else {
