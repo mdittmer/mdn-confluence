@@ -26,7 +26,10 @@ foam.CLASS({
             class: 'String',
             name: 'id',
             label: 'API',
-            required: true,
+            expression: function(interfaceName, apiName) {
+              return `${interfaceName}#${apiName}`;
+            },
+            hidden: true,
             rawTableCellFormatter: function(value, obj, axiom) {
               const textValue = value === undefined ? '&nbsp;' : value;
               return `
@@ -37,13 +40,27 @@ foam.CLASS({
 `;
             },
           },
+          {
+            class: 'String',
+            name: 'interfaceName',
+            required: true,
+          },
+          {
+            class: 'String',
+            name: 'apiName',
+            required: true,
+          },
         ],
 
         methods: [
           {
             name: 'fromGridRow',
             code: function(gridRow) {
-              this.id = gridRow.id;
+              const names = gridRow.id.split('#');
+              foam.assert(names.length === 2,
+                          `Unexpected GridRow id: ${gridRow.id}`);
+              this.interfaceName = names[0];
+              this.apiName = names[1];
               const data = gridRow.data;
               const props = this.cls_.getAxiomsByClass(this.GridProperty);
               foam.assert(props.length === data.length,
