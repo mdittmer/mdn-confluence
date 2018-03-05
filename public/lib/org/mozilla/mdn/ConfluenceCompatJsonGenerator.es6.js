@@ -5,7 +5,7 @@
 
 foam.CLASS({
   package: 'org.mozilla.mdn',
-  name: 'CompatJsonGenerator',
+  name: 'ConfluenceCompatJsonGenerator',
 
   axioms: [foam.pattern.Multiton.create({property: 'outputDir'})],
 

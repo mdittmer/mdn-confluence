@@ -9,6 +9,10 @@ const process = require('process');
 
 const argv = require('yargs')
       .help('h')
+      .option('all', {
+        desc: `Rather than tweaking existing version information, generate version information for all APIs in confluence data.`,
+        default: false,
+      })
       .option('confluence-release-url', {
         alias: 'cru',
         desc: `Absolute https: or file: URL to JSON for Confluence release metadata for GridRows`,
@@ -58,8 +62,10 @@ mdn.InfraServerContextProvider.create().install();
   const confluenceDAO = foam.dao.MDAO.create({of: confluenceSink.of});
   await Promise.all(confluenceSink.array.map(item => confluenceDAO.put(item)));
   const jsonDAO = foam.dao.MDAO.create({of: mdn.CompatJson});
-  await mdn.CompatJsonGenerator.create({
+  const JsonGenerator = argv.all ?
+        mdn.ConfluenceCompatJsonGenerator :
+        mdn.CompatConfluenceJsonGenerator;
+  await JsonGenerator.create({
     outputDir: argv.outputDir,
   }).generateJson(confluenceDAO, jsonDAO);
-}
-)();
+})();
