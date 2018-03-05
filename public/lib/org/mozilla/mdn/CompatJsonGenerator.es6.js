@@ -43,7 +43,8 @@ foam.CLASS({
       name: 'generateJson',
       code: (async function(confluenceDAO) {
         this.ensureDirs_();
-        const confluenceRows = (await confluenceDAO.select()).array;
+        const confluenceRows =
+              (await confluenceDAO.orderBy(confluenceDAO.of.ID).select()).array;
         let jsons = {};
         for (const confluenceRow of confluenceRows) {
           const adapter = this.CompatJsonAdapter.create();
