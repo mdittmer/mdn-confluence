@@ -59,10 +59,7 @@ foam.CLASS({
               continue;
             }
             const confluenceRow = await confluenceDAO.find(`${iface}#${api}`);
-            if (!confluenceRow) {
-              debugger;
-              continue;
-            }
+            if (!confluenceRow) continue;
             const adapter = this.CompatJsonAdapter.create();
             const json = this.getJson_(confluenceRow.interfaceName, jsons)
                   .fromNpmModule();
