@@ -7,7 +7,7 @@ cd "${WD}/.."
 
 node node_modules/foam2/tools/build.js web,firebase
 
-mkdir -p data
+mkdir -p data/browser-compat-data
 
 mkdir -p public/third_party/foam2
 cp \
