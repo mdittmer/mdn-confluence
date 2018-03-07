@@ -60,7 +60,7 @@ foam.CLASS({
           const json = jsons[id];
           promises.push(this.writeFile_(
               `${this.outputDir}/${json.compatDir}/${json.interfaceName}.json`,
-              JSON.stringify(json.json, null, 2)));
+              JSON.stringify(json.json, null, 2) + '\n'));
         }
 
         return Promise.all(promises);
