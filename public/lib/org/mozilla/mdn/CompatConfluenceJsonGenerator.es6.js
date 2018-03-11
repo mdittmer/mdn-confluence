@@ -22,6 +22,11 @@ foam.CLASS({
       name: 'outputDir',
     },
     {
+      class: 'Array',
+      of: 'String',
+      name: 'interfaces',
+    },
+    {
       name: 'mdnData_',
       factory: function() { return require('mdn-browser-compat-data'); },
     },
@@ -50,8 +55,15 @@ foam.CLASS({
         let jsons = {};
         const ifaces = Object.assign(
             {}, this.mdnApis_, this.mdnBuiltins_);
-        for (const iface of Object.keys(ifaces)) {
+        const keys = this.interfaces.length > 0 ?
+            this.interfaces.filter(str => !!ifaces[str]) :
+            Object.keys(ifaces);
+        for (const iface of keys) {
           if (iface.indexOf('__') !== -1) continue;
+
+          const json = this.getJson_(iface, jsons).fromNpmModule();
+          const interfacesJson = json.getInterfacesJson();
+
           for (const api of Object.keys(ifaces[iface])) {
             if (/[^a-z]/i.test(api) ||
                 !(ifaces[iface][api].__compat &&
@@ -61,29 +73,22 @@ foam.CLASS({
             const confluenceRow = await confluenceDAO.find(`${iface}#${api}`);
             if (!confluenceRow) continue;
             const adapter = this.CompatJsonAdapter.create();
-            const json = this.getJson_(confluenceRow.interfaceName, jsons)
-                  .fromNpmModule();
-            const confluenceSupport =
-                  adapter.confluenceRowToCompatJsonFragment(confluenceRow);
             const compatSupport = ifaces[iface][api].__compat.support;
-            // const interfacesJson = json.getInterfacesJson();
-            // adapter.patch(interfacesJson[iface][api], ifaces[iface][api]);
-            // adapter.patchCompatJsonFileFromConfluenceRow(interfacesJson,
-            //                                              confluenceRow);
+            const confluenceSupport = adapter.confluenceRowToCompatJsonFragment(
+                confluenceRow, compatSupport);
 
             const keys = Object.keys(compatSupport);
             for (const key of keys) {
               if (confluenceSupport[key]) {
-                const baseSupport =
-                      json.getInterfacesJson()[iface][api].__compat.support;
+                const baseSupport = interfacesJson[iface][api].__compat.support;
                 foam.assert(baseSupport[key],
                             `Missing base ${key} support for ${iface}#${api}`);
                 adapter.patch(baseSupport[key], confluenceSupport[key]);
               }
             }
-
-            jsons[json.id] = json;
           }
+
+          jsons[json.id] = json;
         }
 
         let promises = [];

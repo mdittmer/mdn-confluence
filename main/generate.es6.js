@@ -8,8 +8,15 @@ const path = require('path');
 const process = require('process');
 
 const argv = require('yargs')
-      .help('h')
-      .option('all', {
+      .help('help').alias('help', 'h')
+      .option('interfaces', {
+        alias: 'i',
+        desc: `Comma-separated list of interfaces to generate JSON for; omit to include all interfaces`,
+        default: '',
+        coerce: iStr => iStr.split(',').filter(str => !!str),
+      })
+      .option('from-confluence', {
+        alias: 'fc',
         desc: `Rather than tweaking existing version information, generate version information for all APIs in confluence data.`,
         default: false,
       })
@@ -67,5 +74,6 @@ mdn.InfraServerContextProvider.create().install();
         mdn.CompatConfluenceJsonGenerator;
   await JsonGenerator.create({
     outputDir: argv.outputDir,
+    interfaces: argv.interfaces,
   }).generateJson(confluenceDAO, jsonDAO);
 })();

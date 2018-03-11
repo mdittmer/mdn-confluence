@@ -6,6 +6,7 @@
 foam.CLASS({
   package: 'org.mozilla.mdn',
   name: 'ConfluenceCompatJsonGenerator',
+  implements: ['foam.mlang.Expressions'],
 
   axioms: [foam.pattern.Multiton.create({property: 'outputDir'})],
 
@@ -13,12 +14,19 @@ foam.CLASS({
     'foam.dao.MDAO',
     'org.mozilla.mdn.CompatJson',
     'org.mozilla.mdn.CompatJsonAdapter',
+    'org.mozilla.mdn.generated.ConfluenceRow',
   ],
+  imports: ['creationContext'],
 
   properties: [
     {
       class: 'String',
       name: 'outputDir',
+    },
+    {
+      class: 'Array',
+      of: 'String',
+      name: 'interfaces',
     },
     {
       name: 'mdnData_',
@@ -43,18 +51,35 @@ foam.CLASS({
       name: 'generateJson',
       code: (async function(confluenceDAO) {
         this.ensureDirs_();
-        const confluenceRows =
-              (await confluenceDAO.orderBy(confluenceDAO.of.ID).select()).array;
+        const ConfluenceRow = this.creationContext
+                .lookup('org.mozilla.mdn.generated.ConfluenceRow');
+        const dao = (this.interfaces.length > 0 ?
+                     confluenceDAO.where(this.IN(
+                       ConfluenceRow.INTERFACE_NAME,
+                       this.interfaces)) :
+                     confluenceDAO).orderBy(confluenceDAO.of.ID);
+        const confluenceRows = (await dao.select()).array;
         let jsons = {};
+        let json;
+        let interfaceName;
         for (const confluenceRow of confluenceRows) {
           const adapter = this.CompatJsonAdapter.create();
-          const json = this.getJson_(confluenceRow.interfaceName, jsons)
-                .fromNpmModule();
+
+          // Whenever interfaceName changes, store accumulated JSON and
+          // get fresh JSON for new interface.
+          if (confluenceRow.interfaceName !== interfaceName) {
+            jsons[json.id] = json;
+            interfaceName = confluenceRow.interfaceName;
+            json = this.getJson_(interfaceName, jsons).fromNpmModule();
+          }
+
           const interfacesJson = json.getInterfacesJson();
           adapter.patchCompatJsonFileFromConfluenceRow(
               interfacesJson, confluenceRow);
-          jsons[json.id] = json;
         }
+        // Store last interface's accumulated JSON.
+        jsons[json.id] = json;
+
         let promises = [];
         for (const id of Object.keys(jsons)) {
           const json = jsons[id];

@@ -25,7 +25,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function confluenceRowToCompatJsonFragment(row) {
+    function confluenceRowToCompatJsonFragment(row, opt_existing) {
       const props = row.cls_.getAxiomsByClass(this.GridProperty)
             .sort((p1, p2) => foam.util.compare(
                 p1.release.releaseDate,
@@ -64,10 +64,20 @@ foam.CLASS({
 
         const mdnBrowserName = browserName.toLowerCase();
         support[mdnBrowserName] = {};
-        if (versionAdded !== true)
+
+        // Only add version_added if:
+        // (1) Missing=>added transition observed (i.e., versionAdded !== true),
+        // or
+        // (2) Existing data claims there is no version_added.
+        if (versionAdded !== true ||
+            (opt_existing &&
+             !(opt_existing[mdnBrowserName] &&
+               opt_existing[mdnBrowserName].version_added))) {
           support[mdnBrowserName].version_added = versionAdded;
+        }
+
         if (versionRemoved)
-          support[mdnBrowserName].version_added = versionRemoved;
+          support[mdnBrowserName].version_removed = versionRemoved;
       }
 
       return support;
