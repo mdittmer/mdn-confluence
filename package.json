@@ -7,7 +7,6 @@
     "deploy": "npm run build && firebase deploy",
     "generate": "node ./main/generate.es6.js",
     "import": "node ./main/import.es6.js",
-    "import": "node ./main/server.es6.js",
     "postinstall": "mkdir -p data/browser-compat-data && ./scripts/install_firebase.sh && npm run build",
     "start": "npm run build && firebase serve"
   },
