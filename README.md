@@ -51,6 +51,34 @@ If the diff is empty, then Confluence and MDN agree on browser versioning
 information for `Foo` and `Bar`. If not, you can make any manual adjustments,
 commit and the change, and submit a pull request.
 
+#### Cross-referencing data for pull requests
+
+Updates based on Confluence data can be cross-referenced by linking to a view
+of the [API Catalog](https://web-confluence.appspot.com/#!/catalog) that
+shows relevant browser releases. Discovering such a view can be done
+manually, but there is also a tool that generates a URL based on browsers and
+an interface of interest. The URL generator is run with:
+
+    node main/confluence.es6.js [options/flags]
+
+or
+
+    npm run confluence -- [options/flags]
+
+To see documentation for all `[options/flags]`, pass the `--help`
+flag. Here are some examples:
+
+```bash
+# HTMLDocument interface for all versions of Safari
+npm run confluence -- -q HTMLDocument -b safari
+# Sometimes the list of browsers is long (and slow to load). Specify just a few
+# that highlight version info
+npm run confluence -- -q AnimationEffectReadOnly -b firefox51,firefox52,firefox53,firefox54
+# Browsers prefix match on browser and OS [name][version], so...
+# As above, only Windows 10:
+npm run confluence -- -q AnimationEffectReadOnly -b f51w10,f52w10,f53w10,f54w10
+```
+
 ### Web UI
 
 The web UI is for interactively cross-referencing Confluence and MDN compat
