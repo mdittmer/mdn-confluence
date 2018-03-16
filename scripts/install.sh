@@ -1,6 +1,9 @@
 #!/bin/bash
 
-WD=$(readlink -f $(dirname "$BASH_SOURCE"))
+REL_WD=$(dirname "$BASH_SOURCE")
+pushd ${REL_WD} > /dev/null
+WD=$(pwd)
+popd > /dev/null
 
 cd "${WD}/.."
 
