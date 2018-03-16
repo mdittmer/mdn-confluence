@@ -108,7 +108,7 @@ foam.CLASS({
         } else if (Array.isArray(value)) {
           this.patchArrayOnto(base, value, key, opts);
         } else if (this.isObject_(value)) {
-          if (!base[key]) base[key] = {};
+          if (!base.hasOwnProperty(key)) base[key] = {};
           this.patch(base[key], value);
         } else {
           base[key] = value;
