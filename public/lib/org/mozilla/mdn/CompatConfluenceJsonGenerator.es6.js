@@ -27,6 +27,11 @@ foam.CLASS({
       name: 'interfaces',
     },
     {
+      class: 'Array',
+      of: 'String',
+      name: 'browsers',
+    },
+    {
       name: 'mdnData_',
       factory: function() { return require('mdn-browser-compat-data'); },
     },
@@ -55,29 +60,34 @@ foam.CLASS({
         let jsons = {};
         const ifaces = Object.assign(
             {}, this.mdnApis_, this.mdnBuiltins_);
-        const keys = this.interfaces.length > 0 ?
+        const ifaceKeys = this.interfaces.length > 0 ?
             this.interfaces.filter(str => !!ifaces[str]) :
             Object.keys(ifaces);
-        for (const iface of keys) {
+        for (const iface of ifaceKeys) {
           if (iface.indexOf('__') !== -1) continue;
 
           const json = this.getJson_(iface, jsons).fromNpmModule();
           const interfacesJson = json.getInterfacesJson();
 
-          for (const api of Object.keys(ifaces[iface])) {
-            if (/[^a-z]/i.test(api) ||
-                !(ifaces[iface][api].__compat &&
-                  ifaces[iface][api].__compat.support)) {
-              continue;
-            }
+          // Get list of legitimate APIs. If none, continue.
+          const apiKeys = Object.keys(ifaces[iface])
+              .filter(api => !(/[^a-z]/i.test(api) ||
+                               !(ifaces[iface][api].__compat &&
+                                 ifaces[iface][api].__compat.support)));
+          if (apiKeys.length === 0) continue;
+
+          for (const api of apiKeys) {
             const confluenceRow = await confluenceDAO.find(`${iface}#${api}`);
             if (!confluenceRow) continue;
             const adapter = this.CompatJsonAdapter.create();
             const compatSupport = ifaces[iface][api].__compat.support;
             const confluenceSupport = adapter.confluenceRowToCompatJsonFragment(
-                confluenceRow, compatSupport);
+                confluenceRow, {existing: compatSupport});
 
-            const keys = Object.keys(compatSupport);
+            const keys = this.browsers.length === 0 ?
+                Object.keys(compatSupport) :
+                Object.keys(compatSupport)
+                    .filter(key => this.browsers.includes(key));
             for (const key of keys) {
               if (confluenceSupport[key]) {
                 const baseSupport = interfacesJson[iface][api].__compat.support;

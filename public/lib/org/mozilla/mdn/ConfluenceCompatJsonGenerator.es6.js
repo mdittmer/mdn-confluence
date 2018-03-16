@@ -29,6 +29,11 @@ foam.CLASS({
       name: 'interfaces',
     },
     {
+      class: 'Array',
+      of: 'String',
+      name: 'browsers',
+    },
+    {
       name: 'mdnData_',
       factory: function() { return require('mdn-browser-compat-data'); },
     },
@@ -62,6 +67,7 @@ foam.CLASS({
         let jsons = {};
         let json;
         let interfaceName;
+        const browsers = this.browsers.length > 0 ? this.browsers : null;
         for (const confluenceRow of confluenceRows) {
           const adapter = this.CompatJsonAdapter.create();
 
@@ -75,7 +81,7 @@ foam.CLASS({
 
           const interfacesJson = json.getInterfacesJson();
           adapter.patchCompatJsonFileFromConfluenceRow(
-              interfacesJson, confluenceRow);
+              interfacesJson, confluenceRow, {browsers});
         }
         // Store last interface's accumulated JSON.
         jsons[json.id] = json;

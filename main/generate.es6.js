@@ -15,6 +15,12 @@ const argv = require('yargs')
         default: '',
         coerce: iStr => iStr.split(',').filter(str => !!str),
       })
+      .option('browsers', {
+        alias: 'b',
+        desc: `Comma-separated list of browser namesinterfaces to generate JSON for; omit to include all browsers`,
+        default: '',
+        coerce: bStr => bStr.split(',').filter(str => !!str).map(str => str.toLowerCase()),
+      })
       .option('from-confluence', {
         alias: 'fc',
         desc: `Rather than tweaking existing version information, generate version information for all APIs in confluence data.`,
@@ -75,5 +81,6 @@ mdn.InfraServerContextProvider.create().install();
   await JsonGenerator.create({
     outputDir: argv.outputDir,
     interfaces: argv.interfaces,
+    browsers: argv.browsers,
   }).generateJson(confluenceDAO, jsonDAO);
 })();

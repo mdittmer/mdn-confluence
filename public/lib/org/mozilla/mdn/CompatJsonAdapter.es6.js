@@ -25,7 +25,7 @@ foam.CLASS({
   ],
 
   methods: [
-    function confluenceRowToCompatJsonFragment(row, opt_existing) {
+    function confluenceRowToCompatJsonFragment(row, opts) {
       const props = row.cls_.getAxiomsByClass(this.GridProperty)
             .sort((p1, p2) => foam.util.compare(
                 p1.release.releaseDate,
@@ -36,6 +36,11 @@ foam.CLASS({
       let support = {};
 
       for (const browserName of browserNames) {
+        if (opts && opts.browsers &&
+            !opts.browsers.includes(browserName.toLowerCase())) {
+          continue;
+        }
+
         const browserProps = props
             .filter(p => p.release.browserName === browserName);
         if (browserProps.filter(p => !!p.f(row)).length === 0) continue;
@@ -70,9 +75,9 @@ foam.CLASS({
         // or
         // (2) Existing data claims there is no version_added.
         if (versionAdded !== true ||
-            (opt_existing &&
-             !(opt_existing[mdnBrowserName] &&
-               opt_existing[mdnBrowserName].version_added))) {
+            (opts && opts.existing &&
+             !(opts.existing[mdnBrowserName] &&
+               opts.existing[mdnBrowserName].version_added))) {
           support[mdnBrowserName].version_added = versionAdded;
         }
 
@@ -82,7 +87,7 @@ foam.CLASS({
 
       return support;
     },
-    function patchCompatJsonFileFromConfluenceRow(json, row, opt_arrayMatcher) {
+    function patchCompatJsonFileFromConfluenceRow(json, row, opts) {
       const patch = this.confluenceRowToCompatJsonFragment(row);
       let data = json;
 
@@ -91,17 +96,17 @@ foam.CLASS({
       data = data.__compat || (data.__compat = {});
       data = data.support || (data.support = {});
 
-      this.patch(data, patch, opt_arrayMatcher);
+      this.patch(data, patch, opts);
 
       return json;
     },
-    function patch(base, patch, opt_arrayMatcher) {
+    function patch(base, patch, opts) {
       for (const key of Object.keys(patch)) {
         const value = patch[key];
         if (Array.isArray(base[key])) {
-          this.patchOntoArray(base[key], value, opt_arrayMatcher);
+          this.patchOntoArray(base[key], value, opts);
         } else if (Array.isArray(value)) {
-          this.patchArrayOnto(base, value, key, opt_arrayMatcher);
+          this.patchArrayOnto(base, value, key, opts);
         } else if (this.isObject_(value)) {
           if (!base[key]) base[key] = {};
           this.patch(base[key], value);
@@ -110,7 +115,7 @@ foam.CLASS({
         }
       }
     },
-    function patchOntoArray(base, patch, opt_arrayMatcher) {
+    function patchOntoArray(base, patch, opts) {
       if (Array.isArray(patch)) {
         for (let i = 0; i < patch.length; i++) {
           if (foam.Undefined.isInstance(patch[i])) continue;
@@ -121,19 +126,21 @@ foam.CLASS({
           }
         }
       } else {
-        const idx = (opt_arrayMatcher || this.defaultArrayMatcher)(base);
+        const idx = ((opts && opts.arrayMatcher) ||
+                     this.defaultArrayMatcher)(base);
         if (idx === -1) base.unshift(patch);
         else this.patch(base[idx], patch);
       }
     },
-    function patchArrayOnto(base, patch, key, opt_arrayMatcher) {
+    function patchArrayOnto(base, patch, key, opts) {
       if (foam.Undefined.isInstance(base[key])) {
         base[key] = [];
         this.patchOntoArray(base[key], patch);
         return;
       }
 
-      const idx = (opt_arrayMatcher || this.defaultArrayMatcher)(patch);
+      const idx = ((opts && opts.arrayMatcher) ||
+                   this.defaultArrayMatcher)(patch);
       if (idx === -1) {
         patch.unshift(base[key]);
       } else {
