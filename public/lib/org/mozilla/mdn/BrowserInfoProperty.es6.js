@@ -7,8 +7,6 @@ foam.CLASS({
   package: 'org.mozilla.mdn',
   name: 'BrowserInfoProperty',
   extends: 'foam.core.FObjectProperty',
-  // TODO(markdittmer): This is a hack to get a .myClass() implementation.
-  implements: ['foam.u2.Element'],
 
   requires: ['org.mozilla.mdn.BrowserInfo'],
 
@@ -90,5 +88,9 @@ foam.CLASS({
 
   methods: [
     function toString() { return this.name; },
+    {
+      name: 'myClass',
+      code: foam.u2.Element.getAxiomByName('myClass').code,
+    },
   ],
 });

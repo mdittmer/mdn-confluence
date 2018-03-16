@@ -1,4 +1,4 @@
 node_modules
-public/data
+data
 public/third_party
-_site
+.local

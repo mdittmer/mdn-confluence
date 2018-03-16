@@ -8,85 +8,103 @@ foam.CLASS({
   name: 'BaseForeignPredicateProvider',
   extends: 'org.mozilla.mdn.ForeignPredicateProvider',
 
+  requires: [
+    'foam.dao.ArraySink',
+    'foam.mlang.sink.Count',
+  ],
   exports: ['flowControlId'],
 
-  classes: [
-    {
-      name: 'Count',
-      extends: 'foam.mlang.sink.Count',
+  // TODO(markdittmer): These helped performance when the sink remained
+  // client side). Figure out how to use a client-side cache that understands
+  // these without forwarding them to a server.
+  //
+  // classes: [
+  //   {
+  //     name: 'Count',
+  //     extends: 'foam.mlang.sink.Count',
 
-      imports: ['flowControlId as currentFlowControlId'],
+  //     axioms: [
+  //       {
+  //         class: 'foam.box.Remote',
+  //         clientClass: 'foam.dao.ClientSink'
+  //       }
+  //     ],
 
-      properties: [
-        {
-          class: 'Int',
-          name: 'flowControlId',
-          required: true,
-        },
-      ],
+  //     imports: ['flowControlId as currentFlowControlId'],
 
-      methods: [
-        function init() {
-          this.SUPER();
-          this.validate();
-        },
-        function put(_, sub) {
-          if (sub && this.flowControlId !== this.currentFlowControlId)
-            sub.detach();
-          this.SUPER();
-        },
-        function remove(_, sub) {
-          if (sub && this.flowControlId !== this.currentFlowControlId)
-            sub.detach();
-          this.SUPER();
-        },
-      ],
-    },
-    {
-      name: 'ArraySink',
-      extends: 'foam.dao.ArraySink',
+  //     properties: [
+  //       {
+  //         class: 'Int',
+  //         name: 'flowControlId',
+  //         required: true,
+  //       },
+  //     ],
 
-      imports: ['flowControlId as currentFlowControlId'],
+  //     methods: [
+  //       function init() {
+  //         this.SUPER();
+  //         this.validate();
+  //       },
+  //       function put(_, sub) {
+  //         if (sub && this.flowControlId !== this.currentFlowControlId)
+  //           sub.detach();
+  //         this.SUPER();
+  //       },
+  //       function remove(_, sub) {
+  //         if (sub && this.flowControlId !== this.currentFlowControlId)
+  //           sub.detach();
+  //         this.SUPER();
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     name: 'ArraySink',
+  //     extends: 'foam.dao.ArraySink',
 
-      properties: [
-        {
-          class: 'Int',
-          name: 'flowControlId',
-          required: true,
-        },
-      ],
+  //     axioms: [
+  //       {
+  //         class: 'foam.box.Remote',
+  //         clientClass: 'foam.dao.ClientSink'
+  //       }
+  //     ],
 
-      methods: [
-        function init() {
-          this.SUPER();
-          this.validate();
-        },
-        function put(o, sub) {
-          if (sub && this.flowControlId !== this.currentFlowControlId)
-            sub.detach();
-          this.SUPER(o, sub);
-        },
-        function remove(o, sub) {
-          if (sub && this.flowControlId !== this.currentFlowControlId)
-            sub.detach();
-          this.SUPER(o, sub);
-        },
-      ],
-    },
-  ],
+  //     imports: ['flowControlId as currentFlowControlId'],
+
+  //     properties: [
+  //       {
+  //         class: 'Int',
+  //         name: 'flowControlId',
+  //         required: true,
+  //       },
+  //     ],
+
+  //     methods: [
+  //       function init() {
+  //         this.SUPER();
+  //         this.validate();
+  //       },
+  //       function put(o, sub) {
+  //         if (sub && this.flowControlId !== this.currentFlowControlId)
+  //           sub.detach();
+  //         this.SUPER(o, sub);
+  //       },
+  //       function remove(o, sub) {
+  //         if (sub && this.flowControlId !== this.currentFlowControlId)
+  //           sub.detach();
+  //         this.SUPER(o, sub);
+  //       },
+  //     ],
+  //   },
+  // ],
 
   properties: [
     {
       class: 'Class',
       name: 'from',
-      required: true,
-      final: true,
     },
     {
       class: 'Class',
       name: 'to',
-      required: true,
-      final: true,
     },
     {
       class: 'Int',
@@ -117,9 +135,12 @@ foam.CLASS({
               return dao.select(this.ArraySink.create({
                 flowControlId: this.flowControlId,
               }));
-            })).then(this.flowControl(arraySink => {
-              if (!arraySink) return null;
-              return this.setPredicateFromArray(arraySink.array);
+            })).then(this.flowControl(sink => {
+              if (!sink) return null;
+              while (!sink.array) {
+                sink = sink.delegate;
+              }
+              return this.setPredicateFromArray(sink.array);
             }));
       },
     },

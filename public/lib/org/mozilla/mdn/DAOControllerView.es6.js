@@ -211,7 +211,7 @@ foam.CLASS({
           .add(searchView)
           .add(this.slot(data => {
             return this.E('actions')
-                .add(data.cls_.getAxiomsByClass(foam.core.Action))
+                .add(data.cls_.getAxiomsByClass(foam.core.Action));
           }, this.data$))
           .start('span').addClass(this.myClass('columns-container'))
           .add(this.columnsIconE)

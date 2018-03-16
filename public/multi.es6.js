@@ -1,38 +1,38 @@
 (async function() {
-  const chr = org.chromium.apis.web;
   const mdn = org.mozilla.mdn;
+  const chr = org.chromium.apis.web;
 
+  mdn.WebClientContextProvider.create().install();
+  const modelDAOProvider = foam.__context__.modelDAOProvider;
+  const DAOProvider = foam.dao.WebSocketDAOProvider;
   //
   // Confluence
   //
 
-  const confluenceRowSpecFetch = await fetch('data/confluence/class:org.mozilla.mdn.generated.ConfluenceRow.txt');
-  const confluenceRowSpecText = await confluenceRowSpecFetch.text();
-  const confluenceRowModel = foam.json.parseString(confluenceRowSpecText);
-  confluenceRowModel.validate();
-  const confluenceRowCls = confluenceRowModel.buildClass();
-  confluenceRowCls.validate();
-  foam.register(confluenceRowCls);
-  foam.package.registerClass(confluenceRowCls);
-
-  const ConfluenceRow = confluenceRowCls;
-  let confluenceDAO = foam.dao.PromisedDAO.create({
-    of: ConfluenceRow,
-    promise: fetch('data/confluence/org.mozilla.mdn.generated.ConfluenceRow.json')
-      .then(response => response.json())
-      .then(json => foam.json.parse(json, ConfluenceRow))
-      .then(array => {
-        const dao = foam.dao.MDAO.create({of: ConfluenceRow});
-        for (const row of array) {
-          dao.put(row);
-        }
-        return dao;
-      }),
+  let confluenceDAO = foam.dao.ProxyDAO.create();
+  const confluenceMonitor = mdn.ModelDAOMonitor.create({
+    classId: 'org.mozilla.mdn.generated.ConfluenceRow',
+    dao$: confluenceDAO.delegate$,
+    daoFactory: (args, ctx) => DAOProvider.create({
+      serviceName: 'confluence',
+      port: mdn.ContextProvider.WEB_SOCKET_DATA_PORT,
+    }).copyFrom(args).createClientDAO(ctx),
   });
 
-  // TODO(markdittmer): Shouldn't these already be in release date order?
-  let confluenceCtx;
+  let confluenceCtx = await new Promise(
+      (resolve, reject) => confluenceMonitor.dao$.sub(
+          foam.events.oneTime((_, __, ___, $) => {
+            try {
+              resolve($.get().__subContext__);
+            } catch (err) {
+              reject(err);
+            }
+          })));
+  const ConfluenceRow =
+        confluenceCtx.lookup('org.mozilla.mdn.generated.ConfluenceRow');
+
   (function() {
+    // TODO(markdittmer): Shouldn't these already be in release date order?
     const sortedColumns = [ConfluenceRow.ID].concat(
         ConfluenceRow.getAxiomsByClass(mdn.GridProperty)
           .filter(prop => !prop.release.isMobile)
@@ -56,7 +56,7 @@
       queryParserFactory: x => mdn.parse.ConfluenceQueryParser.create({
         of: ConfluenceRow,
         interpreter: mdn.parse.ReleaseApiConfluenceQueryInterpreter
-	    .create(null, x),
+            .create(null, x),
       }, x),
     });
   })();
@@ -65,30 +65,26 @@
   // MDN compat
   //
 
-  const mdnRowSpecFetch = await fetch('data/mdn/class:org.mozilla.mdn.generated.CompatRow.txt');
-  const mdnRowSpecText = await mdnRowSpecFetch.text();
-  const compatRowModel = foam.json.parseString(mdnRowSpecText);
-  compatRowModel.validate();
-  const compatRowCls = compatRowModel.buildClass();
-  compatRowCls.validate();
-  foam.register(compatRowCls);
-  foam.package.registerClass(compatRowCls);
-
-  const CompatRow = compatRowCls;
-  const mdnDAO = foam.dao.PromisedDAO.create({
-    of: CompatRow,
-    promise: fetch('data/mdn/org.mozilla.mdn.generated.CompatRow.json').then(response => response.json())
-      .then(json => foam.json.parse(json, CompatRow))
-      .then(array => {
-        const dao = foam.dao.MDAO.create({of: CompatRow});
-        for (const row of array) {
-          dao.put(row);
-        }
-        return dao;
-      }),
+  let mdnDAO = foam.dao.ProxyDAO.create();
+  const compatMonitor = mdn.ModelDAOMonitor.create({
+    classId: 'org.mozilla.mdn.generated.CompatRow',
+    dao$: mdnDAO.delegate$,
+    daoFactory: (args, ctx) => DAOProvider.create({
+      serviceName: 'compat',
+      port: mdn.ContextProvider.WEB_SOCKET_DATA_PORT,
+    }).copyFrom(args).createClientDAO(ctx),
   });
 
-  let mdnCtx;
+  let mdnCtx = await new Promise(
+      (resolve, reject) => compatMonitor.dao$.sub(
+          foam.events.oneTime((_, __, ___, $) => {
+            try {
+              resolve($.get().__subContext__);
+            } catch (err) {
+              reject(err);
+            }
+          })));
+  const CompatRow = mdnCtx.lookup('org.mozilla.mdn.generated.CompatRow');
   (function() {
     const selected = [CompatRow.ID].concat(
         CompatRow.getAxiomsByClass(mdn.BrowserInfoProperty)
@@ -99,38 +95,37 @@
 
     mdnCtx = foam.createSubContext({
       selected,
+      selectionEnabled: true,
       queryParserFactory: x => mdn.parse.CompatQueryParser.create({
         of: CompatRow,
         interpreter: mdn.parse.BrowserInfoCompatQueryInterpreter
-	    .create(null, x),
+            .create(null, x),
       }, x),
     });
   })();
-
 
   //
   // Issues
   //
 
-  const issueDAO = foam.dao.PromisedDAO.create({
-    of: mdn.Issue,
-    promise: fetch('data/issues/org.mozilla.mdn.Issue.json')
-      .then(response => response.json())
-      .then(json => foam.json.parse(json, mdn.Issue))
-      .then(array => {
-        const dao = foam.dao.MDAO.create({of: mdn.Issue});
-        for (const row of array) {
-          dao.put(row);
-        }
-        return dao;
+  const issueDAO = foam.dao.ReadWriteSplitDAO.create({
+    reader: foam.dao.WebSocketDAOProvider.create({
+      of: mdn.Issue,
+      serviceName: 'issues',
+      port: mdn.ContextProvider.WEB_SOCKET_DATA_PORT,
+    }).createClientDAO(),
+    writer: com.google.firebase.AwaitAuthenticationDAO.create({
+      delegate: com.google.firebase.FirestoreDAO.create({
+        collectionPath: 'issues',
       }),
+    }),
   });
-
   const issueCtx = foam.createSubContext({
+    selectionEnabled: true,
     queryParserFactory: x => mdn.parse.IssueQueryParser.create({
       of: mdn.Issue,
       interpreter: mdn.parse.SimpleIssueQueryInterpreter
-	.create(null, x),
+        .create(null, x),
     }, x),
   });
 
@@ -148,6 +143,7 @@
         mdn.DAOController.create({
           label: 'MDN Compat',
           data: mdnDAO,
+          stack: foam.u2.stack.Stack.create(),
         }, mdnCtx),
         mdn.DAOController.create({
           label: 'Confluence/MDN Issues',

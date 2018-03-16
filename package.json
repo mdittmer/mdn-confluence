@@ -1,21 +1,23 @@
 {
   "name": "mdn-confluence",
-  "config": {
-    "releaseURL":"https://storage.googleapis.com/web-api-confluence-data-cache/archive/2018-01-22/00/json/org.chromium.apis.web.Release.json",
-    "dataURL":"https://storage.googleapis.com/web-api-confluence-data-cache/archive/2018-01-22/00/json/org.chromium.apis.web.GridRow.json"
-  },
   "version": "0.0.1",
   "description": "User support tool for maintaining MDN compatability data using Web API Confluence data.",
   "scripts": {
     "build": "./scripts/build.sh",
-    "postinstall": "mkdir -p public/data/confluence public/data/issues public/data/mdn",
-    "start": "python -m SimpleHTTPServer",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "deploy": "npm run build && firebase deploy",
+    "generate": "node ./main/generate.es6.js",
+    "confluence": "node ./main/confluence.es6.js",
+    "import": "node ./main/import.es6.js",
+    "postinstall": "mkdir -p data/browser-compat-data && ./scripts/install_firebase.sh && npm run build",
+    "start": "npm run build && firebase serve"
   },
   "author": "Mark Dittmer",
   "dependencies": {
+    "@google-cloud/firestore": "^0.11.2",
+    "@google-cloud/storage": "^1.6.0",
     "foam2": "git://github.com/foam-framework/foam2.git#mdn-confluence",
     "mdn-browser-compat-data": "git://github.com/mdn/browser-compat-data.git",
-    "web-api-confluence-dashboard": "git://github.com/mdittmer/confluence.git#mdn"
+    "web-api-confluence-dashboard": "git://github.com/mdittmer/confluence.git#mdn",
+    "yargs": "^11.1.0"
   }
 }

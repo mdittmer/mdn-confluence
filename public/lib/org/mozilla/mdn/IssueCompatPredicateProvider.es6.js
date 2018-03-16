@@ -8,19 +8,20 @@ foam.CLASS({
   name: 'IssueCompatPredicateProvider',
   extends: 'org.mozilla.mdn.BaseForeignPredicateProvider',
 
-  requires: [
-    'org.mozilla.mdn.Issue',
-    'org.mozilla.mdn.generated.CompatRow',
-  ],
+  imports: ['creationContext'],
 
   properties: [
     {
       name: 'from',
-      factory: function() { return this.Issue; },
+      factory: function() {
+        return this.creationContext.lookup('org.mozilla.mdn.Issue');
+      },
     },
     {
       name: 'to',
-      factory: function() { return this.CompatRow; },
+      factory: function() {
+        return this.creationContext.lookup('org.mozilla.mdn.generated.CompatRow');
+      },
     },
     {
       name: 'setPredicateFromArray',

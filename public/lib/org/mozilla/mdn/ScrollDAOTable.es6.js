@@ -130,16 +130,16 @@ foam.CLASS({
 
   properties: [
     {
-      class: 'FObjectProperty',
-      of: 'foam.u2.Element',
+      class: 'foam.u2.ViewSpec',
       name: 'scrollView',
       factory: function() {
-        return this.ScrollDAOView.create({
+        return {
+          class: 'foam.u2.view.ScrollDAOView',
           data$: this.data$,
           numRows: 40,
           rowHeight: 50,
           rowFormatter: this.RowFormatter.create(),
-        });
+        };
       },
     },
     {
@@ -195,7 +195,7 @@ ul.foam-u2-view-ScrollDAOView > li {
             });
         }))
         .start('div').addClass(this.myClass('scroll-container'))
-        .add(this.scrollView).end();
+        .start(this.scrollView).end();
     },
   ],
 });

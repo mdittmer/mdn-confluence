@@ -12,12 +12,10 @@ foam.CLASS({
     {
       class: 'Class',
       name: 'from',
-      required: true,
     },
     {
       class: 'Class',
       name: 'to',
-      required: true,
     },
     {
       class: 'foam.dao.DAOProperty',
