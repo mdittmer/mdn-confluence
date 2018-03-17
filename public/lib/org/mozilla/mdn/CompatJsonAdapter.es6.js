@@ -108,7 +108,7 @@ foam.CLASS({
         } else if (Array.isArray(value)) {
           this.patchArrayOnto(base, value, key, opts);
         } else if (this.isObject_(value)) {
-          if (!base.hasOwnProperty(key)) base[key] = {};
+          if (!this.hap_(base, key)) base[key] = {};
           this.patch(base[key], value);
         } else {
           base[key] = value;
@@ -186,6 +186,9 @@ foam.CLASS({
     },
     function isObject_(value) {
       return value !== null && foam.Object.isInstance(value);
+    },
+    function hap_(obj, propName) {
+      return Object.prototype.hasOwnProperty.call(obj, propName);
     },
   ],
 });
