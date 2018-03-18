@@ -9,6 +9,12 @@ const process = require('process');
 
 const argv = require('yargs')
       .help('help').alias('help', 'h')
+      .option('fill-only', {
+        type: 'boolean',
+        alias: 'fo',
+        desc: `Whether or not to only add missing version information`,
+        default: false,
+      })
       .option('interfaces', {
         alias: 'i',
         desc: `Comma-separated list of interfaces to generate JSON for; omit to include all interfaces`,
@@ -75,10 +81,11 @@ mdn.InfraServerContextProvider.create().install();
   const confluenceDAO = foam.dao.MDAO.create({of: confluenceSink.of});
   await Promise.all(confluenceSink.array.map(item => confluenceDAO.put(item)));
   const jsonDAO = foam.dao.MDAO.create({of: mdn.CompatJson});
-  const JsonGenerator = argv.all ?
+  const JsonGenerator = argv.fromConfluence ?
         mdn.ConfluenceCompatJsonGenerator :
         mdn.CompatConfluenceJsonGenerator;
   await JsonGenerator.create({
+    fillOnly: argv.fillOnly,
     outputDir: argv.outputDir,
     interfaces: argv.interfaces,
     browsers: argv.browsers,

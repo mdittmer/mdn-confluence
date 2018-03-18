@@ -3,6 +3,8 @@
 // found in the LICENSE file.
 'use strict';
 
+// TODO(markdittmer): Major overlap between this and
+// CompatConfluenceJsonGenerator. Refactor to common base class.
 foam.CLASS({
   package: 'org.mozilla.mdn',
   name: 'ConfluenceCompatJsonGenerator',
@@ -19,6 +21,10 @@ foam.CLASS({
   imports: ['creationContext'],
 
   properties: [
+    {
+      class: 'Boolean',
+      name: 'fillOnly',
+    },
     {
       class: 'String',
       name: 'outputDir',
@@ -68,20 +74,27 @@ foam.CLASS({
         let json;
         let interfaceName;
         const browsers = this.browsers.length > 0 ? this.browsers : null;
+        const patchOpts = this.fillOnly ? {
+          browsers,
+          patchPredicate: (base, patch, opts) => {
+            // Do not overwrite browser version numbers (which are strings).
+            return !foam.String.isInstance(base);
+          },
+        } : {browsers};
         for (const confluenceRow of confluenceRows) {
           const adapter = this.CompatJsonAdapter.create();
 
           // Whenever interfaceName changes, store accumulated JSON and
           // get fresh JSON for new interface.
           if (confluenceRow.interfaceName !== interfaceName) {
-            jsons[json.id] = json;
+            if (json) jsons[json.id] = json;
             interfaceName = confluenceRow.interfaceName;
             json = this.getJson_(interfaceName, jsons).fromNpmModule();
           }
 
           const interfacesJson = json.getInterfacesJson();
           adapter.patchCompatJsonFileFromConfluenceRow(
-              interfacesJson, confluenceRow, {browsers});
+              interfacesJson, confluenceRow, patchOpts);
         }
         // Store last interface's accumulated JSON.
         jsons[json.id] = json;

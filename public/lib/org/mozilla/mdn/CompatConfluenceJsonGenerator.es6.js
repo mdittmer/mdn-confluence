@@ -3,6 +3,8 @@
 // found in the LICENSE file.
 'use strict';
 
+// TODO(markdittmer): Major overlap between this and
+// ConfluenceCompatJsonGenerator. Refactor to common base class.
 foam.CLASS({
   package: 'org.mozilla.mdn',
   name: 'CompatConfluenceJsonGenerator',
@@ -17,6 +19,10 @@ foam.CLASS({
   ],
 
   properties: [
+    {
+      class: 'Boolean',
+      name: 'fillOnly',
+    },
     {
       class: 'String',
       name: 'outputDir',
@@ -57,6 +63,13 @@ foam.CLASS({
         const getBrowserName = this.CompatClassGenerator
               .getAxiomByName('browserNameFromMdnKey').code;
 
+        const patchOpts = this.fillOnly ? {
+          patchPredicate: (base, patch, opts) => {
+            // Do not overwrite browser version numbers (which are strings).
+            return !foam.String.isInstance(base);
+          },
+        } : null;
+
         let jsons = {};
         const ifaces = Object.assign(
             {}, this.mdnApis_, this.mdnBuiltins_);
@@ -93,7 +106,8 @@ foam.CLASS({
                 const baseSupport = interfacesJson[iface][api].__compat.support;
                 foam.assert(baseSupport[key],
                             `Missing base ${key} support for ${iface}#${api}`);
-                adapter.patch(baseSupport[key], confluenceSupport[key]);
+                adapter.patch(baseSupport[key], confluenceSupport[key],
+                              patchOpts);
               }
             }
           }

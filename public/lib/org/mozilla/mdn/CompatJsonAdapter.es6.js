@@ -88,7 +88,7 @@ foam.CLASS({
       return support;
     },
     function patchCompatJsonFileFromConfluenceRow(json, row, opts) {
-      const patch = this.confluenceRowToCompatJsonFragment(row);
+      const patch = this.confluenceRowToCompatJsonFragment(row, opts);
       let data = json;
 
       data = data[row.interfaceName] || (data[row.interfaceName] = {});
@@ -103,13 +103,19 @@ foam.CLASS({
     function patch(base, patch, opts) {
       for (const key of Object.keys(patch)) {
         const value = patch[key];
+
+        if (opts && opts.patchPredicate &&
+            !opts.patchPredicate(base[key], value, opts)) {
+          continue;
+        }
+
         if (Array.isArray(base[key])) {
           this.patchOntoArray(base[key], value, opts);
         } else if (Array.isArray(value)) {
           this.patchArrayOnto(base, value, key, opts);
         } else if (this.isObject_(value)) {
           if (!this.hap_(base, key)) base[key] = {};
-          this.patch(base[key], value);
+          this.patch(base[key], value, opts);
         } else {
           base[key] = value;
         }
@@ -120,7 +126,7 @@ foam.CLASS({
         for (let i = 0; i < patch.length; i++) {
           if (foam.Undefined.isInstance(patch[i])) continue;
           if (this.isObject_(base[i]) && this.isObject_(patch[i])) {
-            this.patch(base[i], patch[i]);
+            this.patch(base[i], patch[i], opts);
           } else {
             base[i] = patch[i];
           }
@@ -129,7 +135,7 @@ foam.CLASS({
         const idx = ((opts && opts.arrayMatcher) ||
                      this.defaultArrayMatcher)(base);
         if (idx === -1) base.unshift(patch);
-        else this.patch(base[idx], patch);
+        else this.patch(base[idx], patch, opts);
       }
     },
     function patchArrayOnto(base, patch, key, opts) {
@@ -144,7 +150,7 @@ foam.CLASS({
       if (idx === -1) {
         patch.unshift(base[key]);
       } else {
-        this.patch(base[key], patch[idx]);
+        this.patch(base[key], patch[idx], opts);
       }
       base[key] = [];
       this.patchOntoArray(base[key], patch);
