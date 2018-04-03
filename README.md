@@ -82,7 +82,12 @@ npm run confluence -- -q AnimationEffectReadOnly -b f51w10,f52w10,f53w10,f54w10
 ### Web UI
 
 The web UI is for interactively cross-referencing Confluence and MDN compat
-data. To run the service locally, you need to generate local data for the dev
+data. The UI has special dependencies that are installed via a BASH
+script. To set up the dependencies in a UNIX-like environment, use:
+
+    npm run uiBuild
+
+To run the service locally, you need to generate local data for the dev
 server:
 
     node \
@@ -93,7 +98,7 @@ server:
       --update-issues=true
 
 This will generate data in `data/` based on data at the supplied URLs and the
-current version of MDN compat data insalled in `node_modules/`.
+current version of MDN compat data installed in `node_modules/`.
 
 To start the web assets (firebase) server, use:
 
