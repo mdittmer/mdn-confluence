@@ -39,7 +39,7 @@ const mkPath = (base, parts) => {
     const pathParts = [base].concat(parts.slice(0, i));
     combinedPath = path.resolve.apply(path, pathParts);
     if (!fs.existsSync(combinedPath)) {
-      fs.mkdirSync(path);
+      fs.mkdirSync(combinedPath);
     }
   }
 
