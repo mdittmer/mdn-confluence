@@ -12,6 +12,7 @@ foam.CLASS({
     'foam.dao.WebSocketDAOProvider',
   ],
   exports: [
+    'bcd',
     'codeCtx',
     'codeOutputter',
     'codeParser',
@@ -88,6 +89,20 @@ foam.CLASS({
           serverDAO: foam.isServer ?
               this.MDAO.create({of: foam.core.Model}, this.codeCtx) : null,
         }, this.codeCtx);
+      },
+    },
+    {
+      class: 'String',
+      name: 'bcdModuleName',
+      value: 'mdn-browser-compat-data',
+    },
+    {
+      name: 'bcd',
+      factory: function() {
+        // Resolve any relative path.
+        return /\.\//.test(this.bcdModuleName) ?
+            require(require('path').resolve(this.bcdModuleName)) :
+            require(this.bcdModuleName);
       },
     },
   ],
