@@ -65,11 +65,18 @@ const argv = require('yargs')
           return path.resolve(od);
         },
       })
+      .option('bcd-module', {
+        alias: 'bm',
+        desc: `Custom path to browser-compat-data module`,
+        default: 'mdn-browser-compat-data',
+      })
       .argv;
 
 process.env.DATA_ENV = 'DEV';
 require('../boot.es6.js');
-mdn.InfraServerContextProvider.create().install();
+mdn.InfraServerContextProvider.create({
+  bcdModuleName: argv.bcdModule,
+}).install();
 
 (async function() {
   const confluenceSink =

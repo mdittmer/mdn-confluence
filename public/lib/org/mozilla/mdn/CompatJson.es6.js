@@ -11,6 +11,7 @@ foam.CLASS({
     'foam.net.HTTPRequest',
     'org.mozilla.mdn.CompatJsonAdapter',
   ],
+  imports: ['bcd'],
 
   properties: [
     {
@@ -43,10 +44,6 @@ foam.CLASS({
         return json;
       },
     },
-    {
-      name: 'mdnData_',
-      factory: function() { return require('mdn-browser-compat-data'); },
-    },
   ],
 
   methods: [
@@ -68,7 +65,7 @@ foam.CLASS({
           }).then(str => this.json = JSON.parse(str)).then(() => this);
     },
     function fromNpmModule() {
-      let mdnData = this.mdnData_;
+      let mdnData = this.bcd;
       const parts = this.compatDir.split('/');
       let data = this.json;
       for (const part of parts) {

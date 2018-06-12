@@ -17,6 +17,7 @@ foam.CLASS({
     'org.mozilla.mdn.CompatJson',
     'org.mozilla.mdn.CompatJsonAdapter',
   ],
+  imports: ['bcd'],
 
   properties: [
     {
@@ -38,16 +39,12 @@ foam.CLASS({
       name: 'browsers',
     },
     {
-      name: 'mdnData_',
-      factory: function() { return require('mdn-browser-compat-data'); },
-    },
-    {
       name: 'mdnApis_',
-      factory: function() { return this.mdnData_.api; },
+      factory: function() { return this.bcd.api; },
     },
     {
       name: 'mdnBuiltins_',
-      factory: function() { return this.mdnData_.javascript.builtins; },
+      factory: function() { return this.bcd.javascript.builtins; },
     },
     {
       name: 'fs_',
