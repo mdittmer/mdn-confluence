@@ -9,11 +9,11 @@ const process = require('process');
 global.FOAM_FLAGS = {firebase: true};
 require('foam2');
 
-require('./node_modules/web-api-confluence-dashboard/lib/indexed_dao.es6.js');
-require('./node_modules/web-api-confluence-dashboard/lib/http_json_dao.es6.js');
-require('./node_modules/web-api-confluence-dashboard/lib/grid_dao.es6.js');
-require('./node_modules/web-api-confluence-dashboard/lib/local_json_dao.es6.js');
-require('./node_modules/web-api-confluence-dashboard/lib/web_apis/release.es6.js');
+require('web-api-confluence-dashboard/lib/indexed_dao.es6.js');
+require('web-api-confluence-dashboard/lib/http_json_dao.es6.js');
+require('web-api-confluence-dashboard/lib/grid_dao.es6.js');
+require('web-api-confluence-dashboard/lib/local_json_dao.es6.js');
+require('web-api-confluence-dashboard/lib/web_apis/release.es6.js');
 global.chr = org.chromium.apis.web;
 
 require('./public/lib/org/mozilla/mdn/property.es6.js');
