@@ -22,19 +22,20 @@ const SOURCE_ROOT = path.join(SCRIPT_DIR, '..');
 const isWinPlatform = ('win32' === process.platform);
 
 /**
- * Executes any arbitrary shell commands.
+ * Executes any arbitrary shell commands in a synchronous manner and 
+ * pipes the stdin and stderr of the running command to the main process.
  * 
  * @param {string} cmd The command to execute. 
  * @param {...string} arg Optional arguments for the provided command. 
  */
-function runCommand(cmd, ...args) {
+function runCommandThenExit(cmd, ...args) {
 
   try {
 
     let spawnedChild;
     const cmdWithArgs = cmd + ' ' + args.join(' ');
 
-    console.log('Executing command:', cmdWithArgs);
+    console.log('[post_install]: Executing command:', cmdWithArgs);
 
     // Execute the provided command in a win32 env.
     if (isWinPlatform) {
@@ -51,24 +52,19 @@ function runCommand(cmd, ...args) {
 
     if (spawnedChild) {
 
-      // Log the stdin stream.
-      spawnedChild.stdout.on('data', (data) => {
+      // Pipe the stdin stream.
+      spawnedChild.stdout.pipe(process.stdout);
 
-        console.log(data.toString());
-
-      });
-
-      // Log the stderr stream.
-      spawnedChild.stderr.on('data', (data) => {
-
-        console.error(data.toString());
-
-      });
+      // Pipe the stderr stream.
+      spawnedChild.stderr.pipe(process.stderr);
 
       // Log the exit status.
       spawnedChild.on('exit', (code) => {
 
-        console.log(`Child exited with code ${code}`);
+        console.log(`[post_install]: Child exited with code ${code}`);
+
+        // Terminate the process, with the same exit code as of child.
+        process.exit(code);
 
       });
 
@@ -77,7 +73,10 @@ function runCommand(cmd, ...args) {
   } catch (err) {
 
     // log the error.
-    console.error(err);
+    console.error('[post_install]' + err);
+
+    // Terminate the process with errorCode = 1.
+    process.exit(1);
 
   }
 
@@ -87,11 +86,11 @@ function runCommand(cmd, ...args) {
 if (isWinPlatform) {
 
   // win32.
-  runCommand('mkdir', path.join('data', 'browser-compat-data'));
+  runCommandThenExit('mkdir', path.join('data', 'browser-compat-data'));
 
 } else {
 
   // darwin or linux.
-  runCommand('mkdir', '-p', path.join('data', 'browser-compat-data'));
+  runCommandThenExit('mkdir', '-p', path.join('data', 'browser-compat-data'));
 
 }
