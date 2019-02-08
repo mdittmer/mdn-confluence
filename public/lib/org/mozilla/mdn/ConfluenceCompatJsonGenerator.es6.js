@@ -71,7 +71,7 @@ foam.CLASS({
         const browsers = this.browsers.length > 0 ? this.browsers : null;
         const patchOpts = this.fillOnly ? {
           browsers,
-          patchPredicate: (base, patch, opts) => {
+          patchPredicate: (key, base, patch) => {
             // Do not overwrite browser version numbers (which are strings).
             return !foam.String.isInstance(base);
           },

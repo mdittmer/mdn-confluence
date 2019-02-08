@@ -105,7 +105,7 @@ foam.CLASS({
         const value = patch[key];
 
         if (opts && opts.patchPredicate &&
-            !opts.patchPredicate(base[key], value, opts)) {
+            !opts.patchPredicate(key, base[key], value)) {
           continue;
         }
 
