@@ -15,6 +15,12 @@ const argv = require('yargs')
         desc: `Whether or not to only add missing version information`,
         default: false,
       })
+      .option('remove', {
+        type: 'boolean',
+        alias: 'rm',
+        desc: `Whether or not to remove supported versions based on absense of support in Confluence`,
+        default: false,
+      })
       .option('interfaces', {
         alias: 'i',
         desc: `Comma-separated list of interfaces to generate JSON for; omit to include all interfaces`,
@@ -93,6 +99,7 @@ mdn.InfraServerContextProvider.create({
         mdn.CompatConfluenceJsonGenerator;
   await JsonGenerator.create({
     fillOnly: argv.fillOnly,
+    remove: argv.remove,
     outputDir: argv.outputDir,
     interfaces: argv.interfaces,
     browsers: argv.browsers,

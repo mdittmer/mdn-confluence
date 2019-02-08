@@ -25,6 +25,10 @@ foam.CLASS({
       name: 'fillOnly',
     },
     {
+      class: 'Boolean',
+      name: 'remove',
+    },
+    {
       class: 'String',
       name: 'outputDir',
     },
@@ -47,6 +51,10 @@ foam.CLASS({
       factory: function() { return this.bcd.javascript.builtins; },
     },
     {
+      name: 'compareVersions_',
+      factory: function() { return require('compare-versions'); },
+    },
+    {
       name: 'fs_',
       factory: function() { return require('fs'); },
     },
@@ -60,12 +68,31 @@ foam.CLASS({
         const getBrowserName = this.CompatClassGenerator
               .getAxiomByName('browserNameFromMdnKey').code;
 
-        const patchOpts = this.fillOnly ? {
-          patchPredicate: (base, patch, opts) => {
-            // Do not overwrite browser version numbers (which are strings).
-            return !foam.String.isInstance(base);
-          },
-        } : null;
+        const patchOpts = {
+          patchPredicate: (key, base, patch) => {
+            if (!this.remove) {
+              // When not asked to trust removals, don't add `version_removed`
+              // or increase `version_added`.
+              if (key === 'version_removed') {
+                return false;
+              }
+
+              if (key === 'version_added' &&
+                  foam.String.isInstance(base) &&
+                  foam.String.isInstance(patch) &&
+                  this.compareVersions_(base, patch) < 0) {
+                return false;
+              }
+            }
+
+            if (this.fillOnly) {
+              // Do not overwrite browser version numbers (which are strings).
+              return !foam.String.isInstance(base);
+            }
+
+            return true;
+          }
+        };
 
         let jsons = {};
         const ifaces = Object.assign(
