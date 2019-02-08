@@ -1,6 +1,6 @@
 {
   "name": "mdn-confluence",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "User support tool for maintaining MDN compatibility data using Web API Confluence data.",
   "scripts": {
     "build": "node ./scripts/build.js",
