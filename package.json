@@ -20,6 +20,6 @@
     "yargs": "^11.1.0"
   },
   "peerDependencies": {
-    "mdn-browser-compat-data": "^0.0.32"
+    "mdn-browser-compat-data": "^0.0.66"
   }
 }
