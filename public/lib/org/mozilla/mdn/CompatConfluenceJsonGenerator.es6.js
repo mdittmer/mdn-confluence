@@ -3,8 +3,6 @@
 // found in the LICENSE file.
 'use strict';
 
-// TODO(markdittmer): Major overlap between this and
-// ConfluenceCompatJsonGenerator. Refactor to common base class.
 foam.CLASS({
   package: 'org.mozilla.mdn',
   name: 'CompatConfluenceJsonGenerator',

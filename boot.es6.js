@@ -31,7 +31,6 @@ require('./public/lib/org/mozilla/mdn/CompatClassGenerator.es6.js');
 require('./public/lib/org/mozilla/mdn/ConfluenceClassGenerator.es6.js');
 require('./public/lib/org/mozilla/mdn/CompatJsonAdapter.es6.js');
 require('./public/lib/org/mozilla/mdn/CompatJson.es6.js');
-require('./public/lib/org/mozilla/mdn/ConfluenceCompatJsonGenerator.es6.js');
 require('./public/lib/org/mozilla/mdn/CompatConfluenceJsonGenerator.es6.js');
 require('./public/lib/org/mozilla/mdn/IssueType.es6.js');
 require('./public/lib/org/mozilla/mdn/IssueStatus.es6.js');
