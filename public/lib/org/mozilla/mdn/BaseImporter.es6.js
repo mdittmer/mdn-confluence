@@ -186,19 +186,6 @@ foam.CLASS({
       },
     },
     {
-      name: 'readFile_',
-      code: function(path) {
-        return this.storageBucketPromise_
-            .then(bucket => new Promise((resolve, reject) => {
-                const stream = bucket.file(path).createReadStream();
-                let bufs = [];
-                stream.on('error', reject);
-                stream.on('data', data => bufs.push(data));
-                stream.on('end', () => resolve(Buffer.concat(bufs).toString()));
-            }));
-      },
-    },
-    {
       name: 'writeFile_',
       code: function(urlStr, data) {
         const url = this.url_.parse(urlStr);
