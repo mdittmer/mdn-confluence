@@ -87,19 +87,6 @@ foam.CLASS({
 
       return support;
     },
-    function patchCompatJsonFileFromConfluenceRow(json, row, opts) {
-      const patch = this.confluenceRowToCompatJsonFragment(row, opts);
-      let data = json;
-
-      data = data[row.interfaceName] || (data[row.interfaceName] = {});
-      data = data[row.apiName] || (data[row.apiName] = {});
-      data = data.__compat || (data.__compat = {});
-      data = data.support || (data.support = {});
-
-      this.patch(data, patch, opts);
-
-      return json;
-    },
     function patch(base, patch, opts) {
       for (const key of Object.keys(patch)) {
         const value = patch[key];
