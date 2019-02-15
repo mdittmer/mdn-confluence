@@ -15,7 +15,7 @@
   "dependencies": {
     "@google-cloud/storage": "^1.7.0",
     "compare-versions": "^3.4.0",
-    "foam2": "git://github.com/foam-framework/foam2.git#mdn-confluence",
+    "foam2": "git://github.com/foam-framework/foam2.git#confluence",
     "web-api-confluence-dashboard": "git://github.com/mdittmer/confluence.git#mdn",
     "yargs": "^11.1.0"
   }
