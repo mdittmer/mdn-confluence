@@ -79,41 +79,6 @@ npm run confluence -- -q AnimationEffectReadOnly -b firefox51,firefox52,firefox5
 npm run confluence -- -q AnimationEffectReadOnly -b f51w10,f52w10,f53w10,f54w10
 ```
 
-### Web UI
-
-The web UI is for interactively cross-referencing Confluence and MDN compat
-data. The UI has special dependencies that are installed via a BASH
-script. To set up the dependencies in a UNIX-like environment, use:
-
-    npm run uiBuild
-
-To run the service locally, you need to generate local data for the dev
-server:
-
-    node \
-      main/import.es6.js \
-      --data-env=DEV \
-      --confluence-release-url=https://storage.googleapis.com/web-api-confluence-data-cache/latest/json/org.chromium.apis.web.Release.json \
-      --confluence-data-url=https://storage.googleapis.com/web-api-confluence-data-cache/latest/json/org.chromium.apis.web.GridRow.json \
-      --update-issues=true
-
-This will generate data in `data/` based on data at the supplied URLs and the
-current version of MDN compat data installed in `node_modules/`.
-
-To start the web assets (firebase) server, use:
-
-    firebase serve
-
-This will serve `localhost:5000`. To start the data server, use:
-
-    node main/server.es6.js --data-env=DEV
-
-This will load data from your local `data/` directory. To view the
-multi-collection cross-referencing page, point your browser at
-`http://localhost:5000/multi.html`.
-
-- [Out-of-Date-but-Functional Demo](https://mdittmer.github.io/mdn-confluence/multi.html)
-
 ## Contributing
 
 If you've got a great idea to make this better, please feel free to file
