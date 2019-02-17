@@ -7,9 +7,7 @@
     "confluence": "node ./main/confluence.es6.js",
     "generate": "node ./main/generate.es6.js",
     "import": "node ./main/import.es6.js",
-    "postinstall": "node ./scripts/post_install.js && npm run build",
-    "uiBuild": "./scripts/install_firebase.sh && npm run build",
-    "uiStart": "npm run build && firebase serve"
+    "postinstall": "node ./scripts/post_install.js && npm run build"
   },
   "author": "Mark Dittmer",
   "dependencies": {
