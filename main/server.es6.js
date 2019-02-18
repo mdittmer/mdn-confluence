@@ -4,7 +4,7 @@
 'use strict';
 
 const argv = require('yargs')
-      .help('h')
+      .help('help').alias('help', 'h')
       .option('data-env', {
         alias: 'de',
         desc: `The environment where data should be imported to. See org.mozilla.mdn.DataEnv for details.`,
