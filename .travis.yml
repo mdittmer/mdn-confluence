@@ -1,0 +1,14 @@
+language: node_js
+node_js: stable
+env:
+  # Use --throw-deprecation to fail on unhandled promise rejections.
+  - NODE_OPTIONS=--throw-deprecation
+script:
+  - npm run confluence | grep -F 'https://web-confluence.appspot.com'
+  - npm install mdn-browser-compat-data
+  - npm run generate
+  - |
+    if [[ -z $(find data/browser-compat-data -name '*.json') ]]; then
+      echo "No JSON files found in data/browser-compat-data"
+      exit 1
+    fi
