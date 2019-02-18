@@ -5,7 +5,6 @@
   "scripts": {
     "confluence": "node ./main/confluence.es6.js",
     "generate": "node ./main/generate.es6.js",
-    "import": "node ./main/import.es6.js",
     "postinstall": "node ./scripts/post_install.js"
   },
   "author": "Mark Dittmer",
