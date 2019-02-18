@@ -3,11 +3,10 @@
   "version": "1.0.2",
   "description": "User support tool for maintaining MDN compatibility data using Web API Confluence data.",
   "scripts": {
-    "build": "node ./scripts/build.js",
     "confluence": "node ./main/confluence.es6.js",
     "generate": "node ./main/generate.es6.js",
     "import": "node ./main/import.es6.js",
-    "postinstall": "node ./scripts/post_install.js && npm run build"
+    "postinstall": "node ./scripts/post_install.js"
   },
   "author": "Mark Dittmer",
   "dependencies": {
