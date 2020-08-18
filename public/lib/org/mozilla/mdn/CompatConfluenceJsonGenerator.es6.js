@@ -78,7 +78,7 @@ foam.CLASS({
               if (key === 'version_added' &&
                   foam.String.isInstance(base) &&
                   foam.String.isInstance(patch) &&
-                  this.compareVersions_(base, patch) < 0) {
+                  this.compareVersions_(base.replace('≤', ''), patch) < 0) {
                 return false;
               }
             }
