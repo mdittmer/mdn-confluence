@@ -18,7 +18,7 @@ const argv = require('yargs')
       .option('remove', {
         type: 'boolean',
         alias: 'rm',
-        desc: `Whether or not to remove supported versions based on absense of support in Confluence`,
+        desc: `Whether or not to remove supported versions based on absence of support in Confluence`,
         default: false,
       })
       .option('interfaces', {
@@ -29,7 +29,7 @@ const argv = require('yargs')
       })
       .option('browsers', {
         alias: 'b',
-        desc: `Comma-separated list of browser namesinterfaces to generate JSON for; omit to include all browsers`,
+        desc: `Comma-separated list of browser names to generate JSON for; omit to include all browsers`,
         default: '',
         coerce: bStr => bStr.split(',').filter(str => !!str).map(str => str.toLowerCase()),
       })
