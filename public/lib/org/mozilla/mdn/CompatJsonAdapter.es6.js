@@ -30,71 +30,64 @@ foam.CLASS({
             .sort((p1, p2) => foam.util.compare(
                 p1.release.releaseDate,
                 p2.release.releaseDate));
-      const browserNames = new Set(
-          props.map(p => p.release.browserName));
 
-      let support = {};
+      const support = {};
 
-      for (const browserName of browserNames) {
-        if (opts && opts.browsers &&
-            !opts.browsers.includes(browserName.toLowerCase())) {
+      // Scan through the row once, interleaving which browser is being updated.
+      // This is equivalent to processing each browser in turn because the state
+      // for each browser is contained in |support[browser]|.
+      for (const prop of props) {
+        const [browser, version] = this.getMdnBrowserRelease(prop.release, opts.mdnBrowsers);
+        if (!browser || !version) {
+          continue;
+        }
+        if (opts && opts.browsers && opts.browsers.length &&
+            !opts.browsers.includes(browser)) {
           continue;
         }
 
-        const browserProps = props
-            .filter(p => p.release.browserName === browserName);
-        if (browserProps.filter(p => !!p.f(row)).length === 0) continue;
+        const value = prop.f(row);
 
-        let versionAdded = null;
-        let versionRemoved = null;
-        for (let i = 0; i < browserProps.length; i++) {
-          const browserProp = browserProps[i];
-          const value = browserProp.f(row);
-          if (value && !versionAdded) {
-            if (i === 0) {
-              versionAdded = true;
+        if (!support[browser]) {
+          // This is the first release in Confluence.
+          support[browser] = {};
+          if (value) {
+            // Use ≤ except for Edge 12 which is the first release.
+            // (This could be generalized by consulting |opts.mdnBrowsers|.)
+            if (browser === 'edge' && version === '12') {
+              support[browser].version_added = version;
             } else {
-              versionAdded = this.getVersionString(
-                  row, browserProp, browserProps);
+              support[browser].version_added = '≤' + version;
             }
+          } else {
+            support[browser].version_added = false;
           }
-          if (versionAdded && !value) {
-            versionRemoved = this.getVersionString(
-                row, browserProp, browserProps);
-            break;
-          }
+          continue;
         }
 
-        foam.assert(versionAdded, `Expected to find ${browserName} version`);
-
-        const mdnBrowserName = browserName.toLowerCase();
-        support[mdnBrowserName] = {};
-
-        // Only add version_added if:
-        // (1) Missing=>added transition observed (i.e., versionAdded !== true),
-        // or
-        // (2) Existing data claims there is no version_added.
-        if (versionAdded !== true ||
-            (opts && opts.existing &&
-             !(opts.existing[mdnBrowserName] &&
-               opts.existing[mdnBrowserName].version_added))) {
-          support[mdnBrowserName].version_added = versionAdded;
+        if (value && !support[browser].version_added) {
+          if (!support[browser].version_removed) {
+            support[browser].version_added = version;
+          }
+        } else if (support[browser].version_added && !value) {
+          if (!support[browser].version_removed) {
+            support[browser].version_removed = version;
+          }
+        } else if (value && support[browser].version_removed) {
+          // This is the case of an API being added, removed, and then added
+          // again. TODO: handle it.
         }
-
-        if (versionRemoved)
-          support[mdnBrowserName].version_removed = versionRemoved;
       }
 
       return support;
     },
     function patch(base, patch, opts) {
+      if (opts && opts.patchPredicate && !opts.patchPredicate(base, patch)) {
+        return;
+      }
+
       for (const key of Object.keys(patch)) {
         const value = patch[key];
-
-        if (opts && opts.patchPredicate &&
-            !opts.patchPredicate(key, base[key], value)) {
-          continue;
-        }
 
         if (Array.isArray(base[key])) {
           this.patchOntoArray(base[key], value, opts);
@@ -142,40 +135,51 @@ foam.CLASS({
       base[key] = [];
       this.patchOntoArray(base[key], patch);
     },
-    function getVersionString(row, browserProp, browserProps) {
-      let version = browserProp.release.browserVersion;
-      const versionParts = version.split('.');
+    function getMdnBrowserRelease(release, mdnBrowsers) {
+      const {browserName, browserVersion, osName, osVersion} = release;
 
-      // Attempt to shrink version string to be as short as possible.
-      while (versionParts.length > 1) {
-        // Get all browsers with matching version prefix.
-        browserProps = browserProps
-            .filter(p => p.release.browserVersion.indexOf(version) !== -1);
-
-        // If fewer than 2 browser have this prefix, then shrink version number
-        // and continue.
-        if (browserProps.length < 2) {
-          versionParts.pop();
-          version = versionParts.join('.');
-          continue;
+      // Map browser + OS to an MDN/BCD browser identifier. Only use one desktop
+      // OS for each browser, to avoid spurious updates due to staggered
+      // support. This ignores data for Chrome and Firefox on macOS.
+      const mapping = {
+        Chrome: {
+          Windows: 'chrome',
+          Android: 'chrome_android',
+        },
+        Edge: {
+          Windows: 'edge',
+        },
+        Firefox: {
+          Windows: 'firefox',
+          Android: 'firefox_android',
+        },
+        Safari: {
+          OSX: 'safari',
+          iPhone: 'safari_ios'
         }
+      };
 
-        // Check whether all browsers with prefix have same value.
-        let value = browserProps[0].f(row);
-        let i;
-        for (i = 1; i < browserProps.length; i++) {
-          if (browserProps[i].f(row) !== value) break;
-        }
-        // If exited loop early, then not all browser with prefix have same
-        // value. Stop shrinking version number immediately.
-        if (i < browserProps.length) break;
-
-        // Shrink version number.
-        versionParts.pop();
-        version = versionParts.join('.');
+      const browser = mapping[browserName] && mapping[browserName][osName];
+      if (!browser) {
+        return [null, null];
       }
 
-      return version;
+      // Look for a matching MDN/BCD version by removing one version component
+      // at a time until there's an exact match. Safari for iOS is special:
+      // https://github.com/mdn/browser-compat-data/blob/master/docs/data-guidelines.md#safari-for-ios-versioning
+      const mdnReleases = mdnBrowsers[browser].releases;
+      const targetVersion = browser === 'safari_ios' ? osVersion : browserVersion;
+      const versionParts = targetVersion.split('.');
+      while (versionParts.length) {
+        const version = versionParts.join('.');
+        if (version in mdnReleases) {
+          return [browser, version];
+        }
+        versionParts.pop();
+      }
+
+      // No release found.
+      return [null, null];
     },
     function isObject_(value) {
       return value !== null && foam.Object.isInstance(value);

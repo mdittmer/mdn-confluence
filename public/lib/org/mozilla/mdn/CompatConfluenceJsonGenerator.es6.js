@@ -45,6 +45,10 @@ foam.CLASS({
       factory: function() { return this.bcd.api; },
     },
     {
+      name: 'mdnBrowsers_',
+      factory: function() { return this.bcd.browsers; },
+    },
+    {
       name: 'mdnBuiltins_',
       factory: function() { return this.bcd.javascript.builtins; },
     },
@@ -67,25 +71,32 @@ foam.CLASS({
               .getAxiomByName('browserNameFromMdnKey').code;
 
         const patchOpts = {
-          patchPredicate: (key, base, patch) => {
+          patchPredicate: (base, patch) => {
             if (!this.remove) {
-              // When not asked to trust removals, don't add `version_removed`
-              // or increase `version_added`.
-              if (key === 'version_removed') {
+              // When not asked to trust removals...
+              if ('version_removed' in patch) {
+                // don't add `version_removed`,
                 return false;
               }
 
-              if (key === 'version_added' &&
-                  foam.String.isInstance(base) &&
-                  foam.String.isInstance(patch) &&
-                  this.compareVersions_(base.replace('≤', ''), patch) < 0) {
-                return false;
+              if ('version_added' in patch) {
+                if (base.version_added && !patch.version_added) {
+                  // don't change `version_added` from true/string to false/null,
+                  return false;
+                }
+                if (typeof base.version_added === 'string' &&
+                    typeof patch.version_added === 'string' &&
+                    this.compareVersions_(base.version_added.replace('≤', ''),
+                                          patch.version_added.replace('≤', '')) < 0) {
+                  // and don't increase `version_added`.
+                  return false;
+                }
               }
             }
 
             if (this.fillOnly) {
-              // Do not overwrite browser version numbers (which are strings).
-              return !foam.String.isInstance(base);
+              // Only update `version_added` from falsy to truthy.
+              return !base.version_added && patch.version_added;
             }
 
             return true;
@@ -117,13 +128,11 @@ foam.CLASS({
             const adapter = this.CompatJsonAdapter.create();
             const compatSupport = ifaces[iface][api].__compat.support;
             const confluenceSupport = adapter.confluenceRowToCompatJsonFragment(
-                confluenceRow, {existing: compatSupport});
-
-            const keys = this.browsers.length === 0 ?
-                Object.keys(compatSupport) :
-                Object.keys(compatSupport)
-                    .filter(key => this.browsers.includes(key));
-            for (const key of keys) {
+                confluenceRow, {
+                    browsers: this.browsers,
+                    mdnBrowsers: this.mdnBrowsers_,
+                });
+            for (const key in compatSupport) {
               if (confluenceSupport[key]) {
                 const baseSupport = interfacesJson[iface][api].__compat.support;
                 foam.assert(baseSupport[key],
