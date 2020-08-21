@@ -55,15 +55,6 @@ foam.CLASS({
       }
       return data;
     },
-    function fromGithubRef(ref) {
-      return this.HTTPRequest.create({
-        url: `https://raw.githubusercontent.com/mdn/browser-compat-data/${ref}/${this.compatDir}/${this.interfaceName}.json`,
-      }).send()
-          .then(resp => {
-            if ( resp.status !== 200 ) throw resp;
-            return resp.payload;
-          }).then(str => this.json = JSON.parse(str)).then(() => this);
-    },
     function fromNpmModule() {
       let mdnData = this.bcd;
       const parts = this.compatDir.split('/');
