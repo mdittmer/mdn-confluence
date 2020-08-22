@@ -88,12 +88,11 @@ mdn.InfraServerContextProvider.create({
 
   const confluenceDAO = foam.dao.MDAO.create({of: confluenceSink.of});
   await Promise.all(confluenceSink.array.map(item => confluenceDAO.put(item)));
-  const jsonDAO = foam.dao.MDAO.create({of: mdn.CompatJson});
   await mdn.CompatConfluenceJsonGenerator.create({
     fillOnly: argv.fillOnly,
     remove: argv.remove,
     outputDir: argv.outputDir,
     interfaces: argv.interfaces,
     browsers: argv.browsers,
-  }).generateJson(confluenceDAO, jsonDAO);
+  }).generateJson(confluenceDAO);
 })();
