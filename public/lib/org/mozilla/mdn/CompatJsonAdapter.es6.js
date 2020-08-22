@@ -75,7 +75,13 @@ foam.CLASS({
           }
         } else if (value && support[browser].version_removed) {
           // This is the case of an API being added, removed, and then added
-          // again. TODO: handle it.
+          // again. Put the information in `maintainer_notes` for now.
+          if (!support[browser].maintainer_notes) {
+            support[browser].maintainer_notes = [];
+          }
+          support[browser].maintainer_notes.push(`Removed in ${support[browser].version_removed}`);
+          support[browser].maintainer_notes.push(`Added in ${version}`);
+          delete support[browser].version_removed;
         }
       }
 
