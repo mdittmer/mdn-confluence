@@ -80,19 +80,16 @@ mdn.InfraServerContextProvider.create({
 }).install();
 
 (async function() {
-  const confluenceSink =
-        await mdn.ConfluenceImporter.create({
-          releaseJsonUrl: argv.confluenceReleaseUrl,
-          gridRowsJsonUrl: argv.confluenceDataUrl,
-        }).importClassAndData();
-
-  const confluenceDAO = foam.dao.MDAO.create({of: confluenceSink.of});
-  await Promise.all(confluenceSink.array.map(item => confluenceDAO.put(item)));
   await mdn.CompatConfluenceJsonGenerator.create({
+    confluenceReleaseUrl: argv.confluenceReleaseUrl,
+    confluenceDataUrl: argv.confluenceDataUrl,
     fillOnly: argv.fillOnly,
     remove: argv.remove,
     outputDir: argv.outputDir,
     interfaces: argv.interfaces,
     browsers: argv.browsers,
-  }).generateJson(confluenceDAO);
-})();
+  }).generateJson();
+})().catch(error => {
+  console.error(error);
+  process.exit(1);
+});

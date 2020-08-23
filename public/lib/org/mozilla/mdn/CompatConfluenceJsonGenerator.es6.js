@@ -19,6 +19,14 @@ foam.CLASS({
 
   properties: [
     {
+      class: 'String',
+      name: 'confluenceReleaseUrl',
+    },
+    {
+      class: 'String',
+      name: 'confluenceDataUrl',
+    },
+    {
       class: 'Boolean',
       name: 'fillOnly',
     },
@@ -57,6 +65,10 @@ foam.CLASS({
       factory: function() { return require('compare-versions'); },
     },
     {
+      name: 'fetch_',
+      factory: function() { return require('node-fetch'); },
+    },
+    {
       name: 'fs_',
       factory: function() { return require('fs'); },
     },
@@ -65,10 +77,35 @@ foam.CLASS({
   methods: [
     {
       name: 'generateJson',
-      code: (async function(confluenceDAO) {
+      code: (async function() {
+        // Load and preprocess the Confluence data. The rows have a list of
+        // booleans in the same order as the releases.
+        const confluenceReleases = await this.fetchJson_(this.confluenceReleaseUrl);
+        const confluenceData = await this.fetchJson_(this.confluenceDataUrl);
+        // This will be the list of releases in BCD we have data for and that we
+        // should try to update, taking the --browsers arg into account.
+        const releases = [];
+        confluenceReleases.forEach((confluenceRelease, columnIndex) => {
+          const [browser, version] = this.getMdnBrowserRelease_(confluenceRelease);
+          if (!browser || !version) {
+            return;
+          }
+          if (this.browsers && this.browsers.length && !this.browsers.includes(browser)) {
+            return;
+          }
+          // Add or update an entry in |releases|. One entry can end up with
+          // multiple Confluence releases attached to it.
+          let release = releases.find(r => r.browser === browser && r.version === version);
+          if (!release) {
+            release = {browser, version, confluence: []};
+            releases.push(release);
+          }
+          release.confluence.push(Object.assign({columnIndex}, confluenceRelease));
+        });
+        // Sort by version. It doesn't matter if browsers are interleaved.
+        releases.sort((a, b) => this.compareVersions_(a.version, b.version));
+
         this.ensureDirs_();
-        const getBrowserName = this.CompatClassGenerator
-              .getAxiomByName('browserNameFromMdnKey').code;
 
         const patchOpts = {
           patchPredicate: (base, patch) => {
@@ -123,15 +160,12 @@ foam.CLASS({
           if (apiKeys.length === 0) continue;
 
           for (const api of apiKeys) {
-            const confluenceRow = await confluenceDAO.find(`${iface}#${api}`);
+            const confluenceRow = confluenceData.find(r => r.id === `${iface}#${api}`);
             if (!confluenceRow) continue;
             const adapter = this.CompatJsonAdapter.create();
             const compatSupport = ifaces[iface][api].__compat.support;
             const confluenceSupport = adapter.confluenceRowToCompatJsonFragment(
-                confluenceRow, {
-                    browsers: this.browsers,
-                    mdnBrowsers: this.mdnBrowsers_,
-                });
+                confluenceRow, releases);
             for (const key in compatSupport) {
               if (confluenceSupport[key]) {
                 const baseSupport = interfacesJson[iface][api].__compat.support;
@@ -156,6 +190,65 @@ foam.CLASS({
 
         return Promise.all(promises);
       }),
+    },
+    {
+      name: 'getMdnBrowserRelease_',
+      code: function(release) {
+        const {browserName, browserVersion, osName, osVersion} = release;
+
+        // Map browser + OS to an MDN/BCD browser identifier. Only use one desktop
+        // OS for each browser, to avoid spurious updates due to staggered
+        // support. This ignores data for Chrome and Firefox on macOS.
+        const mapping = {
+          Chrome: {
+            Windows: 'chrome',
+            Android: 'chrome_android',
+          },
+          Edge: {
+            Windows: 'edge',
+          },
+          Firefox: {
+            Windows: 'firefox',
+            Android: 'firefox_android',
+          },
+          Safari: {
+            OSX: 'safari',
+            iPhone: 'safari_ios'
+          }
+        };
+
+        const browser = mapping[browserName] && mapping[browserName][osName];
+        if (!browser) {
+          return [null, null];
+        }
+
+        // Look for a matching MDN/BCD version by removing one version component
+        // at a time until there's an exact match. Safari for iOS is special:
+        // https://github.com/mdn/browser-compat-data/blob/master/docs/data-guidelines.md#safari-for-ios-versioning
+        const mdnReleases = this.mdnBrowsers_[browser].releases;
+        const targetVersion = browser === 'safari_ios' ? osVersion : browserVersion;
+        const versionParts = targetVersion.split('.');
+        while (versionParts.length) {
+          const version = versionParts.join('.');
+          if (version in mdnReleases) {
+            return [browser, version];
+          }
+          versionParts.pop();
+        }
+
+        // No release found.
+        return [null, null];
+      },
+    },
+    {
+      name: 'fetchJson_',
+      code: async function(url) {
+        const r = await this.fetch_(url);
+        if (!r.ok) {
+          throw new Error(`Bad response (${r.status}) for ${url}`);
+        }
+        return r.json();
+      },
     },
     {
       name: 'getJson_',
