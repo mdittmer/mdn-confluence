@@ -25,28 +25,25 @@ foam.CLASS({
   ],
 
   methods: [
-    function confluenceRowToCompatJsonFragment(row, opts) {
-      const props = row.cls_.getAxiomsByClass(this.GridProperty)
-            .sort((p1, p2) => foam.util.compare(
-                p1.release.releaseDate,
-                p2.release.releaseDate));
-
+    function confluenceRowToCompatJsonFragment(row, releases) {
       const support = {};
 
       // Scan through the row once, interleaving which browser is being updated.
       // This is equivalent to processing each browser in turn because the state
       // for each browser is contained in |support[browser]|.
-      for (const prop of props) {
-        const [browser, version] = this.getMdnBrowserRelease(prop.release, opts.mdnBrowsers);
-        if (!browser || !version) {
-          continue;
-        }
-        if (opts && opts.browsers && opts.browsers.length &&
-            !opts.browsers.includes(browser)) {
-          continue;
-        }
+      for (const release of releases) {
+        const {browser, version} = release;
 
-        const value = prop.f(row);
+        // Decide a single support value from potentially multiple conflicting
+        // releases in Confluence. Assume true if any are true.
+        let value = false;
+        for (const confluenceRelease of release.confluence) {
+          const confluenceValue = row.data[confluenceRelease.columnIndex];
+          if (typeof confluenceValue !== 'boolean') {
+            throw new Error(`Expected boolean value, got ${value} for ${JSON.stringify(confluenceRelease)}`);
+          }
+          value = value || confluenceValue;
+        }
 
         if (!support[browser]) {
           // This is the first release in Confluence.
@@ -140,52 +137,6 @@ foam.CLASS({
       }
       base[key] = [];
       this.patchOntoArray(base[key], patch);
-    },
-    function getMdnBrowserRelease(release, mdnBrowsers) {
-      const {browserName, browserVersion, osName, osVersion} = release;
-
-      // Map browser + OS to an MDN/BCD browser identifier. Only use one desktop
-      // OS for each browser, to avoid spurious updates due to staggered
-      // support. This ignores data for Chrome and Firefox on macOS.
-      const mapping = {
-        Chrome: {
-          Windows: 'chrome',
-          Android: 'chrome_android',
-        },
-        Edge: {
-          Windows: 'edge',
-        },
-        Firefox: {
-          Windows: 'firefox',
-          Android: 'firefox_android',
-        },
-        Safari: {
-          OSX: 'safari',
-          iPhone: 'safari_ios'
-        }
-      };
-
-      const browser = mapping[browserName] && mapping[browserName][osName];
-      if (!browser) {
-        return [null, null];
-      }
-
-      // Look for a matching MDN/BCD version by removing one version component
-      // at a time until there's an exact match. Safari for iOS is special:
-      // https://github.com/mdn/browser-compat-data/blob/master/docs/data-guidelines.md#safari-for-ios-versioning
-      const mdnReleases = mdnBrowsers[browser].releases;
-      const targetVersion = browser === 'safari_ios' ? osVersion : browserVersion;
-      const versionParts = targetVersion.split('.');
-      while (versionParts.length) {
-        const version = versionParts.join('.');
-        if (version in mdnReleases) {
-          return [browser, version];
-        }
-        versionParts.pop();
-      }
-
-      // No release found.
-      return [null, null];
     },
     function isObject_(value) {
       return value !== null && foam.Object.isInstance(value);
