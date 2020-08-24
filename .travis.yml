@@ -4,7 +4,6 @@ env:
   # Use --throw-deprecation to fail on unhandled promise rejections.
   - NODE_OPTIONS=--throw-deprecation
 script:
-  - npm run confluence | grep -F 'https://web-confluence.appspot.com'
   - npm install mdn-browser-compat-data
   - npm run generate
   - |
