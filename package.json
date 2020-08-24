@@ -1,6 +1,6 @@
 {
   "name": "mdn-confluence",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "description": "User support tool for maintaining MDN compatibility data using Web API Confluence data.",
   "scripts": {
     "generate": "node ./main/generate.es6.js",
