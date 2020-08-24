@@ -8,7 +8,6 @@ foam.CLASS({
   name: 'CompatJson',
 
   requires: [
-    'foam.net.HTTPRequest',
     'org.mozilla.mdn.CompatJsonAdapter',
   ],
 

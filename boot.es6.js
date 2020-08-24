@@ -8,7 +8,6 @@ const process = require('process');
 
 require('foam2');
 
-require('./public/lib/org/mozilla/mdn/CompatClassGenerator.es6.js');
 require('./public/lib/org/mozilla/mdn/CompatJsonAdapter.es6.js');
 require('./public/lib/org/mozilla/mdn/CompatJson.es6.js');
 require('./public/lib/org/mozilla/mdn/CompatConfluenceJsonGenerator.es6.js');
