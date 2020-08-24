@@ -16,8 +16,6 @@ require('web-api-confluence-dashboard/lib/web_apis/release.es6.js');
 global.chr = org.chromium.apis.web;
 
 require('./public/lib/org/mozilla/mdn/property.es6.js');
-require('./public/lib/foam/json/ModelOutputter.es6.js');
-require('./public/lib/foam/json/ModelParser.es6.js');
 require('./public/lib/org/mozilla/mdn/DataEnv.es6.js');
 require('./public/lib/org/mozilla/mdn/LocalJsonDAO.es6.js');
 require('./public/lib/org/mozilla/mdn/HttpJsonDAO.es6.js');
