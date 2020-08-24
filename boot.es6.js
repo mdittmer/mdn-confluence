@@ -28,8 +28,6 @@ require('./public/lib/org/mozilla/mdn/CompatJsonAdapter.es6.js');
 require('./public/lib/org/mozilla/mdn/CompatJson.es6.js');
 require('./public/lib/org/mozilla/mdn/CompatConfluenceJsonGenerator.es6.js');
 require('./public/lib/org/mozilla/mdn/HashProvider.es6.js');
-require('./public/lib/org/mozilla/mdn/BaseImporter.es6.js');
-require('./public/lib/org/mozilla/mdn/ConfluenceImporter.es6.js');
 require('./public/lib/org/mozilla/mdn/ContextProvider.es6.js');
 require('./public/lib/org/mozilla/mdn/ServerContextProvider.es6.js');
 require('./public/lib/org/mozilla/mdn/InfraServerContextProvider.es6.js');

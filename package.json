@@ -3,13 +3,11 @@
   "version": "1.0.4",
   "description": "User support tool for maintaining MDN compatibility data using Web API Confluence data.",
   "scripts": {
-    "confluence": "node ./main/confluence.es6.js",
     "generate": "node ./main/generate.es6.js",
     "postinstall": "node ./scripts/post_install.js"
   },
   "author": "Mark Dittmer",
   "dependencies": {
-    "@google-cloud/storage": "^2.0.0",
     "compare-versions": "^3.4.0",
     "foam2": "git://github.com/foam-framework/foam2.git#mdn-confluence",
     "node-fetch": "^2.3.0",
