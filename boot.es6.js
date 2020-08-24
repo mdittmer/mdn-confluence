@@ -8,13 +8,6 @@ const process = require('process');
 
 require('foam2');
 
-require('web-api-confluence-dashboard/lib/indexed_dao.es6.js');
-require('web-api-confluence-dashboard/lib/http_json_dao.es6.js');
-require('web-api-confluence-dashboard/lib/grid_dao.es6.js');
-require('web-api-confluence-dashboard/lib/local_json_dao.es6.js');
-require('web-api-confluence-dashboard/lib/web_apis/release.es6.js');
-global.chr = org.chromium.apis.web;
-
 require('./public/lib/org/mozilla/mdn/CompatClassGenerator.es6.js');
 require('./public/lib/org/mozilla/mdn/CompatJsonAdapter.es6.js');
 require('./public/lib/org/mozilla/mdn/CompatJson.es6.js');
