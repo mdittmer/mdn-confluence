@@ -14,9 +14,12 @@ foam.CLASS({
     'org.mozilla.mdn.CompatJson',
     'org.mozilla.mdn.CompatJsonAdapter',
   ],
-  imports: ['bcd'],
 
   properties: [
+    {
+      class: 'String',
+      name: 'bcdModule',
+    },
     {
       class: 'String',
       name: 'confluenceReleaseUrl',
@@ -48,16 +51,25 @@ foam.CLASS({
       name: 'browsers',
     },
     {
+      name: 'bcd_',
+      factory: function() {
+        // Resolve any relative path.
+        return /\.\//.test(this.bcdModule) ?
+            require(require('path').resolve(this.bcdModule)) :
+            require(this.bcdModule);
+      },
+    },
+    {
       name: 'mdnApis_',
-      factory: function() { return this.bcd.api; },
+      factory: function() { return this.bcd_.api; },
     },
     {
       name: 'mdnBrowsers_',
-      factory: function() { return this.bcd.browsers; },
+      factory: function() { return this.bcd_.browsers; },
     },
     {
       name: 'mdnBuiltins_',
-      factory: function() { return this.bcd.javascript.builtins; },
+      factory: function() { return this.bcd_.javascript.builtins; },
     },
     {
       name: 'compareVersions_',
@@ -148,7 +160,7 @@ foam.CLASS({
         for (const iface of ifaceKeys) {
           if (iface.indexOf('__') !== -1) continue;
 
-          const json = this.getJson_(iface, jsons).fromNpmModule();
+          const json = this.getJson_(iface, jsons).fromNpmModule(this.bcd_);
           const interfacesJson = json.getInterfacesJson();
 
           // Get list of legitimate APIs. If none, continue.

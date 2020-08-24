@@ -73,14 +73,11 @@ const argv = require('yargs')
       })
       .argv;
 
-process.env.DATA_ENV = 'DEV';
 require('../boot.es6.js');
-mdn.InfraServerContextProvider.create({
-  bcdModuleName: argv.bcdModule,
-}).install();
 
 (async function() {
   await mdn.CompatConfluenceJsonGenerator.create({
+    bcdModule: argv.bcdModule,
     confluenceReleaseUrl: argv.confluenceReleaseUrl,
     confluenceDataUrl: argv.confluenceDataUrl,
     fillOnly: argv.fillOnly,

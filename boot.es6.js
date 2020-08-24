@@ -15,12 +15,8 @@ require('web-api-confluence-dashboard/lib/local_json_dao.es6.js');
 require('web-api-confluence-dashboard/lib/web_apis/release.es6.js');
 global.chr = org.chromium.apis.web;
 
-require('./public/lib/org/mozilla/mdn/DataEnv.es6.js');
 require('./public/lib/org/mozilla/mdn/CompatClassGenerator.es6.js');
 require('./public/lib/org/mozilla/mdn/CompatJsonAdapter.es6.js');
 require('./public/lib/org/mozilla/mdn/CompatJson.es6.js');
 require('./public/lib/org/mozilla/mdn/CompatConfluenceJsonGenerator.es6.js');
-require('./public/lib/org/mozilla/mdn/ContextProvider.es6.js');
-require('./public/lib/org/mozilla/mdn/ServerContextProvider.es6.js');
-require('./public/lib/org/mozilla/mdn/InfraServerContextProvider.es6.js');
 global.mdn = org.mozilla.mdn;
