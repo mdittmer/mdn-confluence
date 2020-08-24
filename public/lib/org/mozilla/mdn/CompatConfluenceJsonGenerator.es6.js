@@ -124,8 +124,8 @@ foam.CLASS({
                 if (typeof base.version_added === 'string' &&
                     typeof patch.version_added === 'string' &&
                     this.compareVersions_(base.version_added.replace('≤', ''),
-                                          patch.version_added.replace('≤', '')) < 0) {
-                  // and don't increase `version_added`.
+                                          patch.version_added.replace('≤', '')) <= 0) {
+                  // and don't increase `version_added` or add only '≤'.
                   return false;
                 }
               }
