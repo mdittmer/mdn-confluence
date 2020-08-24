@@ -17,8 +17,6 @@ global.chr = org.chromium.apis.web;
 
 require('./public/lib/org/mozilla/mdn/property.es6.js');
 require('./public/lib/org/mozilla/mdn/DataEnv.es6.js');
-require('./public/lib/org/mozilla/mdn/LocalJsonDAO.es6.js');
-require('./public/lib/org/mozilla/mdn/HttpJsonDAO.es6.js');
 require('./public/lib/org/mozilla/mdn/GridProperty.es6.js');
 require('./public/lib/org/mozilla/mdn/CompatClassGenerator.es6.js');
 require('./public/lib/org/mozilla/mdn/ConfluenceClassGenerator.es6.js');

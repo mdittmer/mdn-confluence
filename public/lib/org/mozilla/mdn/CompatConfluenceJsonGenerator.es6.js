@@ -10,7 +10,6 @@ foam.CLASS({
   axioms: [foam.pattern.Multiton.create({property: 'outputDir'})],
 
   requires: [
-    'foam.dao.MDAO',
     'org.mozilla.mdn.CompatClassGenerator',
     'org.mozilla.mdn.CompatJson',
     'org.mozilla.mdn.CompatJsonAdapter',
