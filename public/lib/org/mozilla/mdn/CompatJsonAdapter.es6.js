@@ -9,8 +9,6 @@ foam.CLASS({
 
   axioms: [foam.pattern.Singleton.create()],
 
-  requires: ['org.mozilla.mdn.GridProperty'],
-
   properties: [
     {
       class: 'Function',
