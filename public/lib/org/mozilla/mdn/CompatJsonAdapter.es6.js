@@ -105,7 +105,7 @@ foam.CLASS({
     function patchOntoArray(base, patch, opts) {
       if (Array.isArray(patch)) {
         for (let i = 0; i < patch.length; i++) {
-          if (foam.Undefined.isInstance(patch[i])) continue;
+          if (patch[i] === undefined) continue;
           if (this.isObject_(base[i]) && this.isObject_(patch[i])) {
             this.patch(base[i], patch[i], opts);
           } else {
@@ -120,7 +120,7 @@ foam.CLASS({
       }
     },
     function patchArrayOnto(base, patch, key, opts) {
-      if (foam.Undefined.isInstance(base[key])) {
+      if (base[key] === undefined) {
         base[key] = [];
         this.patchOntoArray(base[key], patch);
         return;
@@ -137,7 +137,7 @@ foam.CLASS({
       this.patchOntoArray(base[key], patch);
     },
     function isObject_(value) {
-      return value !== null && foam.Object.isInstance(value);
+      return value !== null && typeof value === 'object';
     },
     function hap_(obj, propName) {
       return Object.prototype.hasOwnProperty.call(obj, propName);
