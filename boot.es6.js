@@ -3,9 +3,6 @@
 // found in the LICENSE file.
 'use strict';
 
-const fs = require('fs');
-const process = require('process');
-
 require('foam2');
 
 require('./public/lib/org/mozilla/mdn/CompatJsonAdapter.es6.js');

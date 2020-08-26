@@ -3,6 +3,12 @@
 // found in the LICENSE file.
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
+
+const compareVersions = require('compare-versions');
+const fetch = require('node-fetch');
+
 foam.CLASS({
   package: 'org.mozilla.mdn',
   name: 'CompatConfluenceJsonGenerator',
@@ -54,7 +60,7 @@ foam.CLASS({
       factory: function() {
         // Resolve any relative path.
         return /\.\//.test(this.bcdModule) ?
-            require(require('path').resolve(this.bcdModule)) :
+            require(path.resolve(this.bcdModule)) :
             require(this.bcdModule);
       },
     },
@@ -69,18 +75,6 @@ foam.CLASS({
     {
       name: 'mdnBuiltins_',
       factory: function() { return this.bcd_.javascript.builtins; },
-    },
-    {
-      name: 'compareVersions_',
-      factory: function() { return require('compare-versions'); },
-    },
-    {
-      name: 'fetch_',
-      factory: function() { return require('node-fetch'); },
-    },
-    {
-      name: 'fs_',
-      factory: function() { return require('fs'); },
     },
   ],
 
@@ -113,7 +107,7 @@ foam.CLASS({
           release.confluence.push(Object.assign({columnIndex}, confluenceRelease));
         });
         // Sort by version. It doesn't matter if browsers are interleaved.
-        releases.sort((a, b) => this.compareVersions_(a.version, b.version));
+        releases.sort((a, b) => compareVersions(a.version, b.version));
 
         this.ensureDirs_();
 
@@ -133,7 +127,7 @@ foam.CLASS({
                 }
                 if (typeof base.version_added === 'string' &&
                     typeof patch.version_added === 'string' &&
-                    this.compareVersions_.compare(
+                    compareVersions.compare(
                       base.version_added.replace('≤', ''),
                       patch.version_added.replace('≤', ''), '<=')) {
                   // and don't increase `version_added` or add only '≤'.
@@ -254,7 +248,7 @@ foam.CLASS({
     {
       name: 'fetchJson_',
       code: async function(url) {
-        const r = await this.fetch_(url);
+        const r = await fetch(url);
         if (!r.ok) {
           throw new Error(`Bad response (${r.status}) for ${url}`);
         }
@@ -292,18 +286,18 @@ foam.CLASS({
     {
       name: 'ensureDir_',
       code: function(path) {
-        if (!this.fs_.existsSync(path))
-          this.fs_.mkdirSync(path);
+        if (!fs.existsSync(path))
+          fs.mkdirSync(path);
       },
     },
     {
       name: 'writeFile_',
       code: function(path, data) {
         return new Promise(
-            (resolve, reject) => this.fs_.writeFile(path, data,
-                                                    err => err ?
-                                                    reject(err) :
-                                                    resolve()));
+            (resolve, reject) => fs.writeFile(path, data,
+                                              err => err ?
+                                              reject(err) :
+                                              resolve()));
       },
     },
   ],
