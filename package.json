@@ -8,7 +8,7 @@
   },
   "author": "Mark Dittmer",
   "dependencies": {
-    "compare-versions": "^3.4.0",
+    "compare-versions": "^3.6.0",
     "foam2": "git://github.com/foam-framework/foam2.git#mdn-confluence",
     "node-fetch": "^2.3.0",
     "yargs": "^15.4.1"
