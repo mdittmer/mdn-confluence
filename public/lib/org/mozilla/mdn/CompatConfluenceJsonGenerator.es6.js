@@ -212,6 +212,13 @@ foam.CLASS({
               return true;
         }
 
+        // Safari 5 and 6 data in Confluence is very broken:
+        // https://github.com/GoogleChromeLabs/confluence/issues/121
+        if (browserName === 'Safari' &&
+            compareVersions.compare(browserVersion, '7', '<')) {
+              return true;
+        }
+
         return false;
       },
     },
