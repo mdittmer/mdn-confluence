@@ -90,6 +90,9 @@ foam.CLASS({
         // should try to update, taking the --browsers arg into account.
         const releases = [];
         confluenceReleases.forEach((confluenceRelease, columnIndex) => {
+          if (this.shouldIgnoreRelease_(confluenceRelease)) {
+            return;
+          }
           const [browser, version] = this.getMdnBrowserRelease_(confluenceRelease);
           if (!browser || !version) {
             return;
@@ -195,6 +198,22 @@ foam.CLASS({
 
         return Promise.all(promises);
       }),
+    },
+    {
+      name: 'shouldIgnoreRelease_',
+      code: function(release) {
+        const {browserName, browserVersion} = release;
+
+        // Chrome 43 changed bindings to move attributes from instances to
+        // prototypes. This has a very large impact on what APIs Confluence
+        // discovers and where they are reported, so ignore earlier version.
+        if (browserName === 'Chrome' &&
+            compareVersions.compare(browserVersion, '43', '<')) {
+              return true;
+        }
+
+        return false;
+      },
     },
     {
       name: 'getMdnBrowserRelease_',
