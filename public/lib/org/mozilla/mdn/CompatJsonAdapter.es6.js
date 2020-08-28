@@ -3,6 +3,8 @@
 // found in the LICENSE file.
 'use strict';
 
+const assert = require('assert');
+
 foam.CLASS({
   package: 'org.mozilla.mdn',
   name: 'CompatJsonAdapter',
@@ -37,9 +39,8 @@ foam.CLASS({
         let value = false;
         for (const confluenceRelease of release.confluence) {
           const confluenceValue = row.data[confluenceRelease.columnIndex];
-          if (typeof confluenceValue !== 'boolean') {
-            throw new Error(`Expected boolean value, got ${value} for ${JSON.stringify(confluenceRelease)}`);
-          }
+          assert.equal(typeof confluenceValue, 'boolean',
+              `Expected boolean value, got ${value} for ${JSON.stringify(confluenceRelease)}`);
           value = value || confluenceValue;
         }
 
