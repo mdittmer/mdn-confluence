@@ -4,10 +4,10 @@
 'use strict';
 
 const fs = require('fs');
+const http = require('https');
 const path = require('path');
 
 const compareVersions = require('compare-versions');
-const fetch = require('node-fetch');
 
 foam.CLASS({
   package: 'org.mozilla.mdn',
@@ -273,12 +273,24 @@ foam.CLASS({
     },
     {
       name: 'fetchJson_',
-      code: async function(url) {
-        const r = await fetch(url);
-        if (!r.ok) {
-          throw new Error(`Bad response (${r.status}) for ${url}`);
-        }
-        return r.json();
+      code: function(url) {
+        return new Promise((resolve, reject) => {
+          http.get(url, res => {
+            if (!(res.statusCode >= 200 && res.statusCode <= 299)) {
+              reject(`Bad response ${res.statusCode} ${res.statusMessage} for ${url}`);
+            }
+            const chunks = [];
+            res.on('data', chunk => chunks.push(chunk));
+            res.on('end', () => {
+              try {
+                resolve(JSON.parse(Buffer.concat(chunks)));
+              } catch (e) {
+                reject(e);
+              }
+            });
+            res.on('error', reject);
+          });
+        });
       },
     },
     {
