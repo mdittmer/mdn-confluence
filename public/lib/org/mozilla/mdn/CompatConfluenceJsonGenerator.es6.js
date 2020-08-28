@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 'use strict';
 
+const assert = require('assert');
 const fs = require('fs');
 const http = require('https');
 const path = require('path');
@@ -177,8 +178,8 @@ foam.CLASS({
             for (const key in compatSupport) {
               if (confluenceSupport[key]) {
                 const baseSupport = interfacesJson[iface][api].__compat.support;
-                foam.assert(baseSupport[key],
-                            `Missing base ${key} support for ${iface}#${api}`);
+                assert(baseSupport[key],
+                       `Missing base ${key} support for ${iface}#${api}`);
                 adapter.patch(baseSupport[key], confluenceSupport[key],
                               patchOpts);
               }
