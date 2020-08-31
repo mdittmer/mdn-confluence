@@ -84,8 +84,12 @@ foam.CLASS({
       return support;
     },
     function patch(base, patch, opts) {
-      if (opts && opts.patchPredicate && !opts.patchPredicate(base, patch)) {
-        return;
+      if (opts && opts.patchFilter) {
+        // Apply patch filter which may drop or modify the patch.
+        patch = opts.patchFilter(base, patch);
+        if (!patch) {
+          return;
+        }
       }
 
       for (const key of Object.keys(patch)) {

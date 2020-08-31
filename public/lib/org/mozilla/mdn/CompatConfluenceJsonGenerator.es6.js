@@ -116,7 +116,9 @@ foam.CLASS({
         this.ensureDirs_();
 
         const patchOpts = {
-          patchPredicate: (base, patch) => {
+          // Called to determine if the patch should be applied, potentially
+          // with modifications.
+          patchFilter: (base, patch) => {
             function isString(value) {
               return typeof value === 'string';
             }
@@ -125,27 +127,32 @@ foam.CLASS({
             }
             assert(!isRange(patch.version_removed), 'Removed version as range not supported');
 
-            // Never add a range if it doesn't contradict the base data.
+            // Don't add a range if it doesn't contradict the base data.
             if (isString(base.version_added) &&
                 isRange(patch.version_added) &&
                 compareVersions.compare(
                   base.version_added.replace('≤', ''),
                   patch.version_added.replace('≤', ''), '<=')) {
-              // TODO: still apply patch.version_removed, if any.
-              return false;
+              if (Object.keys(patch).length === 1) {
+                return null;
+              } else {
+                // Still process the rest of the patch.
+                patch = Object.assign({}, patch);
+                delete patch.version_added;
+              }
             }
 
             if (!this.remove) {
               // When not asked to trust removals...
               if ('version_removed' in patch) {
                 // don't add `version_removed`,
-                return false;
+                return null;
               }
 
               if ('version_added' in patch) {
                 if (base.version_added && !patch.version_added) {
                   // don't change `version_added` from true/string to false/null,
-                  return false;
+                  return null;
                 }
                 if (isString(base.version_added) &&
                     isString(patch.version_added) &&
@@ -153,17 +160,19 @@ foam.CLASS({
                       base.version_added.replace('≤', ''),
                       patch.version_added.replace('≤', ''), '<')) {
                   // and don't increase `version_added`.
-                  return false;
+                  return null;
                 }
               }
             }
 
             if (this.fillOnly) {
               // Only update `version_added` from falsy to truthy.
-              return !base.version_added && patch.version_added;
+              if (base.version_added || !patch.version_added) {
+                return null;
+              }
             }
 
-            return true;
+            return patch;
           }
         };
 
