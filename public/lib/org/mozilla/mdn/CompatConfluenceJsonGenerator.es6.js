@@ -117,6 +117,24 @@ foam.CLASS({
 
         const patchOpts = {
           patchPredicate: (base, patch) => {
+            function isString(value) {
+              return typeof value === 'string';
+            }
+            function isRange(value) {
+              return typeof value === 'string' && value.startsWith('≤');
+            }
+            assert(!isRange(patch.version_removed), 'Removed version as range not supported');
+
+            // Never add a range if it doesn't contradict the base data.
+            if (isString(base.version_added) &&
+                isRange(patch.version_added) &&
+                compareVersions.compare(
+                  base.version_added.replace('≤', ''),
+                  patch.version_added.replace('≤', ''), '<=')) {
+              // TODO: still apply patch.version_removed, if any.
+              return false;
+            }
+
             if (!this.remove) {
               // When not asked to trust removals...
               if ('version_removed' in patch) {
@@ -129,12 +147,12 @@ foam.CLASS({
                   // don't change `version_added` from true/string to false/null,
                   return false;
                 }
-                if (typeof base.version_added === 'string' &&
-                    typeof patch.version_added === 'string' &&
+                if (isString(base.version_added) &&
+                    isString(patch.version_added) &&
                     compareVersions.compare(
                       base.version_added.replace('≤', ''),
-                      patch.version_added.replace('≤', ''), '<=')) {
-                  // and don't increase `version_added` or add only '≤'.
+                      patch.version_added.replace('≤', ''), '<')) {
+                  // and don't increase `version_added`.
                   return false;
                 }
               }
