@@ -7,22 +7,20 @@ foam.CLASS({
   package: 'org.mozilla.mdn',
   name: 'CompatJson',
 
-  requires: [
-    'org.mozilla.mdn.CompatJsonAdapter',
-  ],
+  requires: ['org.mozilla.mdn.CompatJsonAdapter'],
 
   properties: [
     {
       class: 'String',
       name: 'id',
-      expression: function(compatDir, interfaceName) {
+      expression: function (compatDir, interfaceName) {
         return `${compatDir}/${interfaceName}`;
       },
     },
     {
       class: 'String',
       name: 'compatDir',
-      value: 'api'
+      value: 'api',
     },
     {
       class: 'String',
@@ -32,7 +30,7 @@ foam.CLASS({
     {
       class: 'Object',
       name: 'json',
-      factory: function() {
+      factory: function () {
         const parts = this.compatDir.split('/');
         let json = {};
         let data = json;

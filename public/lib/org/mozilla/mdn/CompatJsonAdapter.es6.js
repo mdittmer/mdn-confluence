@@ -15,7 +15,7 @@ foam.CLASS({
     {
       class: 'Function',
       name: 'defaultArrayMatcher',
-      value: function(array) {
+      value: function (array) {
         for (let i = 0; i < array.length; i++) {
           if (!array[i].notes) return i;
         }
@@ -32,15 +32,20 @@ foam.CLASS({
       // This is equivalent to processing each browser in turn because the state
       // for each browser is contained in |support[browser]|.
       for (const release of releases) {
-        const {browser, version} = release;
+        const { browser, version } = release;
 
         // Decide a single support value from potentially multiple conflicting
         // releases in Confluence. Assume true if any are true.
         let value = false;
         for (const confluenceRelease of release.confluence) {
           const confluenceValue = row.data[confluenceRelease.columnIndex];
-          assert.equal(typeof confluenceValue, 'boolean',
-              `Expected boolean value, got ${value} for ${JSON.stringify(confluenceRelease)}`);
+          assert.equal(
+            typeof confluenceValue,
+            'boolean',
+            `Expected boolean value, got ${value} for ${JSON.stringify(
+              confluenceRelease
+            )}`
+          );
           value = value || confluenceValue;
         }
 
@@ -75,7 +80,9 @@ foam.CLASS({
           if (!support[browser].maintainer_notes) {
             support[browser].maintainer_notes = [];
           }
-          support[browser].maintainer_notes.push(`Removed in ${support[browser].version_removed}`);
+          support[browser].maintainer_notes.push(
+            `Removed in ${support[browser].version_removed}`
+          );
           support[browser].maintainer_notes.push(`Added in ${version}`);
           delete support[browser].version_removed;
         }
@@ -118,8 +125,9 @@ foam.CLASS({
           }
         }
       } else {
-        const idx = ((opts && opts.arrayMatcher) ||
-                     this.defaultArrayMatcher)(base);
+        const idx = ((opts && opts.arrayMatcher) || this.defaultArrayMatcher)(
+          base
+        );
         if (idx === -1) base.unshift(patch);
         else this.patch(base[idx], patch, opts);
       }
@@ -131,8 +139,9 @@ foam.CLASS({
         return;
       }
 
-      const idx = ((opts && opts.arrayMatcher) ||
-                   this.defaultArrayMatcher)(patch);
+      const idx = ((opts && opts.arrayMatcher) || this.defaultArrayMatcher)(
+        patch
+      );
       if (idx === -1) {
         patch.unshift(base[key]);
       } else {

@@ -3,13 +3,24 @@
   "version": "2.1.1",
   "description": "User support tool for maintaining MDN compatibility data using Web API Confluence data.",
   "scripts": {
-    "generate": "node ./main/generate.es6.js"
+    "generate": "node ./main/generate.es6.js",
+    "lint": "prettier --check '**/*.js'",
+    "lint-fix": "prettier --write '**/*.js'"
   },
   "author": "Mark Dittmer",
-  "contributors": ["Philip Jägenstedt"],
+  "contributors": [
+    "Philip Jägenstedt"
+  ],
   "dependencies": {
     "compare-versions": "^3.6.0",
     "foam2": "git://github.com/foam-framework/foam2.git#mdn-confluence",
     "yargs": "^15.4.1"
+  },
+  "devDependencies": {
+    "prettier": "^2.1.1"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "tabWidth": 2
   }
 }
