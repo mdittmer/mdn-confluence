@@ -9,7 +9,7 @@ const process = require('process');
 
 const {
   CompatConfluenceJsonGenerator,
-} = require('../public/lib/org/mozilla/mdn/CompatConfluenceJsonGenerator.es6.js');
+} = require('../lib/CompatConfluenceJsonGenerator.es6.js');
 
 const argv = require('yargs')
   .help('help')
