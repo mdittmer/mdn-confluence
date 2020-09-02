@@ -7,6 +7,10 @@ const fs = require('fs');
 const path = require('path');
 const process = require('process');
 
+const {
+  CompatConfluenceJsonGenerator,
+} = require('../public/lib/org/mozilla/mdn/CompatConfluenceJsonGenerator.es6.js');
+
 const argv = require('yargs')
   .help('help')
   .alias('help', 'h')
@@ -77,20 +81,9 @@ const argv = require('yargs')
     default: 'mdn-browser-compat-data',
   }).argv;
 
-require('../boot.es6.js');
+const generator = new CompatConfluenceJsonGenerator(argv);
 
-(async function () {
-  await mdn.CompatConfluenceJsonGenerator.create({
-    bcdModule: argv.bcdModule,
-    confluenceReleaseUrl: argv.confluenceReleaseUrl,
-    confluenceDataUrl: argv.confluenceDataUrl,
-    fillOnly: argv.fillOnly,
-    remove: argv.remove,
-    outputDir: argv.outputDir,
-    interfaces: argv.interfaces,
-    browsers: argv.browsers,
-  }).generateJson();
-})().catch((error) => {
+generator.generateJson().catch((error) => {
   console.error(error);
   process.exit(1);
 });

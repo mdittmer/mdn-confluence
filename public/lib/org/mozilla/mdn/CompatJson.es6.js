@@ -3,68 +3,49 @@
 // found in the LICENSE file.
 'use strict';
 
-foam.CLASS({
-  package: 'org.mozilla.mdn',
-  name: 'CompatJson',
+const { CompatJsonAdapter } = require('./CompatJsonAdapter.es6.js');
 
-  requires: ['org.mozilla.mdn.CompatJsonAdapter'],
+class CompatJson {
+  constructor(compatDir, interfaceName) {
+    this.compatDir = compatDir;
+    this.interfaceName = interfaceName;
 
-  properties: [
-    {
-      class: 'String',
-      name: 'id',
-      expression: function (compatDir, interfaceName) {
-        return `${compatDir}/${interfaceName}`;
-      },
-    },
-    {
-      class: 'String',
-      name: 'compatDir',
-      value: 'api',
-    },
-    {
-      class: 'String',
-      name: 'interfaceName',
-      required: true,
-    },
-    {
-      class: 'Object',
-      name: 'json',
-      factory: function () {
-        const parts = this.compatDir.split('/');
-        let json = {};
-        let data = json;
-        for (const part of parts) {
-          data = data[part] = {};
-        }
-        return json;
-      },
-    },
-  ],
+    this.id = `${compatDir}/${interfaceName}`;
 
-  methods: [
-    function getInterfacesJson() {
-      const parts = this.compatDir.split('/');
-      let data = this.json;
-      for (const part of parts) {
-        data = data[part];
-      }
-      return data;
-    },
-    function fromNpmModule(bcd) {
-      let mdnData = bcd;
-      const parts = this.compatDir.split('/');
-      let data = this.json;
-      for (const part of parts) {
-        data = data[part];
-        mdnData = mdnData[part];
-      }
-      data = data[this.interfaceName] || (data[this.interfaceName] = {});
-      if (!mdnData[this.interfaceName]) return this;
-      mdnData = mdnData[this.interfaceName];
+    // Create this.json.
+    const parts = compatDir.split('/');
+    this.json = {};
+    let data = this.json;
+    for (const part of parts) {
+      data = data[part] = {};
+    }
+  }
 
-      this.CompatJsonAdapter.create().patch(data, mdnData);
-      return this;
-    },
-  ],
-});
+  getInterfacesJson() {
+    const parts = this.compatDir.split('/');
+    let data = this.json;
+    for (const part of parts) {
+      data = data[part];
+    }
+    return data;
+  }
+
+  fromNpmModule(bcd) {
+    let mdnData = bcd;
+    const parts = this.compatDir.split('/');
+    let data = this.json;
+    for (const part of parts) {
+      data = data[part];
+      mdnData = mdnData[part];
+    }
+    data = data[this.interfaceName] || (data[this.interfaceName] = {});
+    if (!mdnData[this.interfaceName]) return this;
+    mdnData = mdnData[this.interfaceName];
+
+    const adapter = new CompatJsonAdapter();
+    adapter.patch(data, mdnData);
+    return this;
+  }
+}
+
+module.exports = { CompatJson };
