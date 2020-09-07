@@ -1,6 +1,6 @@
 {
   "name": "mdn-confluence",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "User support tool for maintaining MDN compatibility data using Web API Confluence data.",
   "scripts": {
     "generate": "node ./main/generate.es6.js",
@@ -32,7 +32,10 @@
       "ecmaVersion": 2017
     },
     "rules": {
-      "curly": ["error", "all"],
+      "curly": [
+        "error",
+        "all"
+      ],
       "max-len": [
         "error",
         {
