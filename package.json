@@ -4,8 +4,8 @@
   "description": "User support tool for maintaining MDN compatibility data using Web API Confluence data.",
   "scripts": {
     "generate": "node ./main/generate.es6.js",
-    "lint": "prettier --check '**/*.js'",
-    "lint-fix": "prettier --write '**/*.js'"
+    "lint": "eslint .",
+    "lint-fix": "eslint --fix ."
   },
   "author": "Mark Dittmer",
   "contributors": [
@@ -16,10 +16,32 @@
     "yargs": "^15.4.1"
   },
   "devDependencies": {
-    "prettier": "^2.1.1"
+    "eslint": "^7.8.1",
+    "eslint-config-google": "^0.14.0"
   },
-  "prettier": {
-    "singleQuote": true,
-    "tabWidth": 2
+  "eslintConfig": {
+    "env": {
+      "es6": true,
+      "node": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "google"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 2017
+    },
+    "rules": {
+      "curly": ["error", "all"],
+      "max-len": [
+        "error",
+        {
+          "ignoreStrings": true,
+          "ignoreTemplateLiterals": true,
+          "ignoreUrls": true
+        }
+      ],
+      "require-jsdoc": "off"
+    }
   }
 }
