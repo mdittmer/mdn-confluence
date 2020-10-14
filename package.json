@@ -11,8 +11,12 @@
   "contributors": [
     "Philip Jägenstedt"
   ],
+  "engines": {
+    "node": ">=10.12.0"
+  },
   "dependencies": {
     "compare-versions": "^3.6.0",
+    "klaw": "^3.0.0",
     "yargs": "^15.4.1"
   },
   "devDependencies": {
