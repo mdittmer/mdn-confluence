@@ -17,7 +17,7 @@
   "dependencies": {
     "compare-versions": "^3.6.0",
     "klaw": "^3.0.0",
-    "yargs": "^15.4.1"
+    "yargs": "^16.2.0"
   },
   "devDependencies": {
     "eslint": "^7.8.1",
